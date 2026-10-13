@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple (AAPL) Hisse Analizi ve PDF Raporlama</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f19',
+                        cardBg: '#131c2e',
+                        borderBg: '#1e293b',
+                        brandBlue: '#3b82f6',
+                        brandGreen: '#10b981',
+                        brandRed: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- html2pdf.js for High Precision PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f1f5f9;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        .glass-card {
+            background: rgba(19, 28, 46, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(30, 41, 59, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-darkBg min-h-screen flex flex-col justify-between antialiased selection:bg-brandBlue selection:text-white">
+
+    <!-- Navigation Header -->
+    <header class="border-b border-borderBg bg-[#0b0f19]/90 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-brandBlue to-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/20">
+                    <i data-lucide="activity" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-bold text-white leading-none">Apple (AAPL) Analiz</h1>
+                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Piyasalar Açık
+                        </span>
+                    </div>
+                    <span class="text-xs text-slate-400">NASDAQ • USD • Canlı Teknik Terminal</span>
+                </div>
+            </div>
+
+            <!-- Header Action Buttons -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="window.location.reload()" class="bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-300 text-xs sm:text-sm font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Yenile">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Yenile</span>
+                </button>
+                <button onclick="exportReportToPDF()" id="pdfBtn" class="bg-brandBlue hover:bg-blue-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center gap-2">
+                    <i data-lucide="file-down" class="w-4 h-4"></i>
+                    <span>PDF İndir</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Wrapper (Target for PDF Generation) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-6" id="pdfReportContainer">
+
+        <!-- Top Live Price & Overview Strip -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-4 shadow-xl">
+            <div class="space-y-1">
+                <span class="text-xs text-slate-400 font-medium">Anlık Fiyat</span>
+                <div class="text-xl sm:text-2xl font-bold text-white flex items-baseline gap-2">
+                    $232.80 
+                    <span class="text-xs sm:text-sm font-semibold text-emerald-400 flex items-center">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i>+1.42 (+0.61%)
+                    </span>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <span class="text-xs text-slate-400 font-medium">Piyasa Değeri</span>
+                <div class="text-lg sm:text-xl font-bold text-white">$3.52 Trilyon</div>
+            </div>
+            <div class="space-y-1">
+                <span class="text-xs text-slate-400 font-medium">52 Haftalık Bant</span>
+                <div class="text-sm sm:text-base font-bold text-white">$164.08 - $237.23</div>
+            </div>
+            <div class="space-y-1">
+                <span class="text-xs text-slate-400 font-medium">Ortalama Hacim</span>
+                <div class="text-sm sm:text-base font-bold text-white">52.1 Milyon</div>
+            </div>
+        </div>
+
+        <!-- Chart Section with Embedded User TradingView Widget -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-borderBg">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="line-chart" class="w-5 h-5 text-brandBlue"></i>
+                    <h2 class="text-sm sm:text-base font-bold text-white">AAPL Gelişmiş Fiyat Grafiği & İndikatörler</h2>
+                </div>
+                <span class="text-xs text-slate-400">Kaynak: TradingView</span>
+            </div>
+
+            <!-- TradingView Widget Container -->
+            <div class="relative w-full rounded-xl overflow-hidden border border-borderBg bg-[#0F0F0F]" style="height: 520px;">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container" style="height:100%;width:100%">
+                    <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+                    <div class="tradingview-widget-copyright text-xs p-1 text-slate-400 bg-[#0F0F0F] border-t border-borderBg flex items-center justify-between">
+                        <div>
+                            <span class="trademark">&nbsp;TradingView tarafından</span> 
+                            <a href="https://tr.tradingview.com/symbols/NASDAQ-AAPL/" rel="noopener nofollow" target="_blank" class="text-brandBlue font-medium hover:underline">AAPL hisse grafiği</a>
+                        </div>
+                        <span class="text-[10px] text-slate-500">Otomatik Güncellenir</span>
+                    </div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                    {
+                        "allow_symbol_change": true,
+                        "calendar": false,
+                        "details": false,
+                        "hide_side_toolbar": true,
+                        "hide_top_toolbar": false,
+                        "hide_legend": false,
+                        "hide_volume": false,
+                        "hotlist": false,
+                        "interval": "D",
+                        "locale": "tr",
+                        "save_image": true,
+                        "style": "1",
+                        "symbol": "NASDAQ:AAPL",
+                        "theme": "dark",
+                        "timezone": "Europe/Istanbul",
+                        "backgroundColor": "#0F0F0F",
+                        "gridColor": "rgba(242, 242, 242, 0.2)",
+                        "watchlist": [],
+                        "withdateranges": false,
+                        "compareSymbols": [],
+                        "support_host": "https://www.tradingview.com",
+                        "studies": [],
+                        "autosize": true
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+
+        <!-- Metrics & Technical Commentary Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Technical Indicators Card -->
+            <div class="glass-card rounded-2xl p-5 space-y-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i data-lucide="gauge" class="w-4 h-4 text-emerald-400"></i>
+                    Teknik Göstergeler & Sinyaller
+                </h3>
+
+                <div class="space-y-3.5 text-xs sm:text-sm">
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>RSI (14)</span>
+                            <span class="text-white font-medium">62.4 (Nötr / Al)</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="bg-emerald-400 h-2 rounded-full" style="width: 62.4%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>MACD (12, 26)</span>
+                            <span class="text-emerald-400 font-medium">Boğa Sinyali (Pozitif)</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="bg-emerald-400 h-2 rounded-full" style="width: 78%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>50 Günlük Hareketli Ortalama</span>
+                            <span class="text-emerald-400 font-medium">Üzerinde ($224.50)</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="bg-brandBlue h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-borderBg grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
+                            <span class="text-slate-400 block">Güçlü Destek</span>
+                            <span class="text-white font-bold text-sm">$228.00</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
+                            <span class="text-slate-400 block">Güçlü Direnç</span>
+                            <span class="text-white font-bold text-sm">$238.50</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analyst Commentary & Notes Pad -->
+            <div class="lg:col-span-2 glass-card rounded-2xl p-5 space-y-4 flex flex-col justify-between">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-brandBlue"></i>
+                            Yatırımcı Analiz Notları & Değerlendirme
+                        </h3>
+                        <span class="text-xs text-slate-400" id="reportDate">Tarih: 13.10.2026</span>
+                    </div>
+                    <textarea id="userCommentary" rows="4" class="w-full bg-slate-900/80 border border-borderBg rounded-xl p-3.5 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-brandBlue transition resize-none" placeholder="Buraya teknik analiz notlarınızı yazabilirsiniz. PDF çıktısına otomatik olarak eklenecektir...">Apple (AAPL) hissesi yükselen kanal içerisindeki formasyonunu koruyor. 228$ desteği üzerinde kaldığı sürece yukarı yönlü momentumun devam etmesi ve 238.50$ direnç seviyesinin test edilmesi beklenmektedir.</textarea>
+                </div>
+
+                <div class="flex items-center justify-between pt-3 border-t border-borderBg text-xs text-slate-400">
+                    <span>💡 İpucu: PDF raporu tüm verileri ve notlarınızı tek sayfada özetler.</span>
+                    <button onclick="exportReportToPDF()" class="bg-brandBlue/10 hover:bg-brandBlue/20 text-brandBlue border border-brandBlue/30 font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                        <i data-lucide="download" class="w-3.5 h-3.5">Raporu Kaydet</i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-borderBg bg-[#0b0f19] py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>© 2026 StockPulse Analytics Terminal. Tüm hakları saklıdır. Veriler TradingView altyapısıyla sağlanmaktadır.</p>
+        </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-brandBlue text-white px-4 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-medium transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-2.5 z-50 border border-blue-400/30">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-300"></i>
+        <span id="toastMsg">İşlem Başarılı</span>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Initialize Lucide Icons on load
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            document.getElementById('reportDate').innerText = `Tarih: ${new Date().toLocaleDateString('tr-TR')}`;
+        });
+
+        // High Quality PDF Report Exporter
+        async function exportReportToPDF() {
+            const btn = document.getElementById('pdfBtn');
+            const originalHTML = btn.innerHTML;
+
+            try {
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Hazırlanıyor...</span>`;
+                lucide.createIcons();
+
+                showToast('PDF raporu oluşturuluyor, lütfen bekleyin...');
+
+                const element = document.getElementById('pdfReportContainer');
+                
+                const opt = {
+                    margin:       [0.3, 0.3, 0.3, 0.3],
+                    filename:     `AAPL_Hisse_Analiz_Raporu_${new Date().toISOString().slice(0,10)}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#0b0f19' },
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+                };
+
+                await html2pdf().set(opt).from(element).save();
+
+                showToast('PDF raporu başarıyla indirildi!');
+
+            } catch (error) {
+                console.error('PDF Export Error:', error);
+                showToast('PDF oluşturulurken bir hata oluştu.');
+            } finally {
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
+
+        // Toast Notification Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
