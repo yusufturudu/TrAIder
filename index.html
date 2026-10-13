@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrAIder - Ai destekli Borsa</title>
+    <title>TrAIder - Profesyonel Finansal Analiz ve Grafik Terminali</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,12 +13,13 @@
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#0b0f19',
-                        cardBg: '#131c2e',
-                        borderBg: '#1e293b',
+                        darkBg: '#090d16',
+                        cardBg: '#111827',
+                        borderBg: '#1f293d',
                         brandBlue: '#3b82f6',
                         brandGreen: '#10b981',
-                        brandRed: '#ef4444'
+                        brandRed: '#ef4444',
+                        accentPurple: '#8b5cf6'
                     }
                 }
             }
@@ -37,20 +38,19 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0b0f19;
+            background-color: #090d16;
             color: #f1f5f9;
         }
         
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0b0f19;
+            background: #090d16;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1e293b;
+            background: #1f293d;
             border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
@@ -58,41 +58,43 @@
         }
 
         .glass-card {
-            background: rgba(19, 28, 46, 0.85);
+            background: rgba(17, 24, 39, 0.85);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(31, 41, 61, 0.7);
         }
     </style>
 </head>
 <body class="bg-darkBg min-h-screen flex flex-col justify-between antialiased selection:bg-brandBlue selection:text-white">
 
     <!-- Navigation Header -->
-    <header class="border-b border-borderBg bg-[#0b0f19]/90 sticky top-0 z-50 backdrop-blur-md">
+    <header class="border-b border-borderBg bg-[#090d16]/90 sticky top-0 z-50 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            <!-- Logo & Brand -->
             <div class="flex items-center space-x-3">
-                <div class="bg-gradient-to-tr from-brandBlue to-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/20">
-                    <i data-lucide="activity" class="w-6 h-6"></i>
+                <div class="bg-gradient-to-tr from-brandBlue via-indigo-600 to-accentPurple p-2.5 rounded-xl text-white shadow-lg shadow-blue-500/20 flex items-center justify-center">
+                    <i data-lucide="cpu" class="w-6 h-6"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-base sm:text-lg font-bold text-white leading-none">Apple (AAPL) Analiz</h1>
-                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Piyasalar Açık
+                        <h1 class="text-base sm:text-xl font-black text-white tracking-wide">Tr<span class="text-brandBlue">AI</span>der</h1>
+                        <span class="bg-brandBlue/10 text-brandBlue border border-brandBlue/20 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brandBlue animate-ping"></span> AI Terminal v3.2
                         </span>
                     </div>
-                    <span class="text-xs text-slate-400">NASDAQ • USD • Canlı Teknik Terminal</span>
+                    <span class="text-xs text-slate-400">Yapay Zeka Destekli Finansal Analiz ve Grafik Terminali</span>
                 </div>
             </div>
 
             <!-- Header Action Buttons -->
             <div class="flex items-center space-x-2 sm:space-x-3">
-                <button onclick="window.location.reload()" class="bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-300 text-xs sm:text-sm font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Yenile">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Yenile</span>
+                <button onclick="refreshData()" class="bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-300 text-xs sm:text-sm font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Verileri Güncelle">
+                    <i data-lucide="refresh-cw" class="w-4 h-4" id="refreshIcon"></i>
+                    <span class="hidden sm:inline">Güncelle</span>
                 </button>
                 <button onclick="exportReportToPDF()" id="pdfBtn" class="bg-brandBlue hover:bg-blue-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center gap-2">
                     <i data-lucide="file-down" class="w-4 h-4"></i>
-                    <span>PDF İndir</span>
+                    <span>PDF Raporu İndir</span>
                 </button>
             </div>
         </div>
@@ -101,109 +103,101 @@
     <!-- Main Content Wrapper (Target for PDF Generation) -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-6" id="pdfReportContainer">
 
-        <!-- Top Live Price & Overview Strip -->
+        <!-- Symbol Selector & Timeframe Toolbar -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+            <!-- Asset Selection Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+                <span class="text-xs text-slate-400 font-medium mr-1 uppercase tracking-wider">Popüler Varlıklar:</span>
+                <button onclick="changeSymbol('NASDAQ:AAPL', 'Apple Inc (AAPL)')" id="btn-AAPL" class="symbol-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-brandBlue text-white shadow-lg shadow-blue-500/20">AAPL</button>
+                <button onclick="changeSymbol('NASDAQ:TSLA', 'Tesla Inc (TSLA)')" id="btn-TSLA" class="symbol-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-cardBg hover:bg-slate-800 text-slate-300 border border-borderBg">TSLA</button>
+                <button onclick="changeSymbol('NASDAQ:MSFT', 'Microsoft Corp (MSFT)')" id="btn-MSFT" class="symbol-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-cardBg hover:bg-slate-800 text-slate-300 border border-borderBg">MSFT</button>
+                <button onclick="changeSymbol('NASDAQ:GOOGL', 'Alphabet Inc (GOOGL)')" id="btn-GOOGL" class="symbol-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-cardBg hover:bg-slate-800 text-slate-300 border border-borderBg">GOOGL</button>
+                <button onclick="changeSymbol('BINANCE:BTCUSDT', 'Bitcoin (BTC/USD)')" id="btn-BTCUSD" class="symbol-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-cardBg hover:bg-slate-800 text-slate-300 border border-borderBg">BTC/USD</button>
+            </div>
+
+            <!-- Custom Symbol Search Input -->
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <input type="text" id="customSymbolInput" placeholder="Sembol (örn: NASDAQ:NVDA)" class="bg-slate-900 border border-borderBg text-xs text-white px-3 py-2 rounded-xl focus:outline-none focus:border-brandBlue w-full md:w-48">
+                <button onclick="applyCustomSymbol()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl border border-borderBg transition">Yükle</button>
+            </div>
+        </div>
+
+        <!-- Live Price & Overview Strip -->
         <div class="glass-card rounded-2xl p-4 sm:p-5 grid grid-cols-2 md:grid-cols-4 gap-4 shadow-xl">
             <div class="space-y-1">
-                <span class="text-xs text-slate-400 font-medium">Anlık Fiyat</span>
+                <span class="text-xs text-slate-400 font-medium" id="lbl-assetName">Aktif Finansal Enstrüman</span>
                 <div class="text-xl sm:text-2xl font-bold text-white flex items-baseline gap-2">
-                    $232.80 
-                    <span class="text-xs sm:text-sm font-semibold text-emerald-400 flex items-center">
-                        <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i>+1.42 (+0.61%)
+                    <span id="stat-price">Canlı Akış</span>
+                    <span class="text-xs sm:text-sm font-semibold text-emerald-400 flex items-center" id="stat-change">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i>Aktif
                     </span>
                 </div>
             </div>
             <div class="space-y-1">
-                <span class="text-xs text-slate-400 font-medium">Piyasa Değeri</span>
-                <div class="text-lg sm:text-xl font-bold text-white">$3.52 Trilyon</div>
+                <span class="text-xs text-slate-400 font-medium">Terminal Durumu</span>
+                <div class="text-lg sm:text-xl font-bold text-white" id="stat-mcap">Senkronize</div>
             </div>
             <div class="space-y-1">
-                <span class="text-xs text-slate-400 font-medium">52 Haftalık Bant</span>
-                <div class="text-sm sm:text-base font-bold text-white">$164.08 - $237.23</div>
+                <span class="text-xs text-slate-400 font-medium">Zaman Dilimi</span>
+                <div class="text-sm sm:text-base font-bold text-white" id="stat-highlow">Günlük (1D)</div>
             </div>
             <div class="space-y-1">
-                <span class="text-xs text-slate-400 font-medium">Ortalama Hacim</span>
-                <div class="text-sm sm:text-base font-bold text-white">52.1 Milyon</div>
+                <span class="text-xs text-slate-400 font-medium">AI Trend Sinyali</span>
+                <div class="text-sm sm:text-base font-bold text-emerald-400 flex items-center gap-1">
+                    <i data-lucide="zap" class="w-4 h-4"></i> <span id="stat-signal">Güçlü AL (Boğa)</span>
+                </div>
             </div>
         </div>
 
-        <!-- Chart Section with Embedded User TradingView Widget -->
+        <!-- TradingView Widget Embed Section -->
         <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
-            <div class="flex items-center justify-between pb-2 border-b border-borderBg">
+            <div class="flex flex-wrap items-center justify-between pb-3 border-b border-borderBg gap-2">
                 <div class="flex items-center gap-2">
                     <i data-lucide="line-chart" class="w-5 h-5 text-brandBlue"></i>
-                    <h2 class="text-sm sm:text-base font-bold text-white">AAPL Gelişmiş Fiyat Grafiği & İndikatörler</h2>
+                    <h2 class="text-sm sm:text-base font-bold text-white" id="chart-title">TrAIder Gelişmiş Canlı Grafik Terminali</h2>
+                </div>
+                <div class="text-xs text-slate-400">
+                    <span>💡 Grafik üstündeki kamera simgesinden anlık görsel kaydedebilirsiniz.</span>
                 </div>
             </div>
 
             <!-- TradingView Widget Container -->
-            <div class="relative w-full rounded-xl overflow-hidden border border-borderBg bg-[#0F0F0F]" style="height: 520px;">
-                <!-- TradingView Widget BEGIN -->
-                <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="relative w-full rounded-xl overflow-hidden border border-borderBg bg-[#0F0F0F]" style="height: 550px;" id="tradingViewWidgetWrapper">
+                <div class="tradingview-widget-container" style="height:100%;width:100%" id="tvContainerElement">
                     <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
-                    <div class="tradingview-widget-copyright text-xs p-1 text-slate-400 bg-[#0F0F0F] border-t border-borderBg flex items-center justify-between">
-                        <div>
-                            <span class="trademark">&nbsp;TrAIder tarafından</span> 
-                            <a href="https://tr.tradingview.com/symbols/NASDAQ-AAPL/" rel="noopener nofollow" target="_blank" class="text-brandBlue font-medium hover:underline">AAPL hisse grafiği</a>
-                        </div>
-                        <span class="text-[10px] text-slate-500">Otomatik Güncellenir</span>
+                    <div class="tradingview-widget-copyright" style="padding: 4px 8px; font-size: 11px; background: #0F0F0F; color: #888;">
+                        <span class="trademark">&nbsp;TrAIder tarafından</span> 
+                        <a href="https://tr.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text" style="color: #3b82f6;">Piyasa Grafiği</span></a>
                     </div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                    {
-                        "allow_symbol_change": true,
-                        "calendar": false,
-                        "details": false,
-                        "hide_side_toolbar": true,
-                        "hide_top_toolbar": false,
-                        "hide_legend": false,
-                        "hide_volume": false,
-                        "hotlist": false,
-                        "interval": "D",
-                        "locale": "tr",
-                        "save_image": true,
-                        "style": "1",
-                        "symbol": "NASDAQ:AAPL",
-                        "theme": "dark",
-                        "timezone": "Europe/Istanbul",
-                        "backgroundColor": "#0F0F0F",
-                        "gridColor": "rgba(242, 242, 242, 0.2)",
-                        "watchlist": [],
-                        "withdateranges": false,
-                        "compareSymbols": [],
-                        "support_host": "https://www.tradingview.com",
-                        "studies": [],
-                        "autosize": true
-                    }
-                    </script>
                 </div>
-                <!-- TradingView Widget END -->
             </div>
         </div>
 
-        <!-- Metrics & Technical Commentary Grid -->
+        <!-- Metrics & AI Commentary Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- Technical Indicators Card -->
             <div class="glass-card rounded-2xl p-5 space-y-4">
                 <h3 class="text-base font-bold text-white flex items-center gap-2">
                     <i data-lucide="gauge" class="w-4 h-4 text-emerald-400"></i>
-                    Teknik Göstergeler & Sinyaller
+                    Yapay Zeka Teknik Göstergeler
                 </h3>
 
                 <div class="space-y-3.5 text-xs sm:text-sm">
                     <div>
                         <div class="flex justify-between text-slate-400 mb-1">
-                            <span>RSI (14)</span>
-                            <span class="text-white font-medium">62.4 (Nötr / Al)</span>
+                            <span>RSI (14) - Göreceli Güç</span>
+                            <span class="text-white font-medium" id="ind-rsi">64.2 (Alım Bölgesi)</span>
                         </div>
                         <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                            <div class="bg-emerald-400 h-2 rounded-full" style="width: 62.4%"></div>
+                            <div id="bar-rsi" class="bg-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 64.2%"></div>
                         </div>
                     </div>
 
                     <div>
                         <div class="flex justify-between text-slate-400 mb-1">
-                            <span>MACD (12, 26)</span>
-                            <span class="text-emerald-400 font-medium">Boğa Sinyali (Pozitif)</span>
+                            <span>MACD Trend Momentum</span>
+                            <span class="text-emerald-400 font-medium" id="ind-macd">Boğa Baskın (Pozitif)</span>
                         </div>
                         <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
                             <div class="bg-emerald-400 h-2 rounded-full" style="width: 78%"></div>
@@ -212,22 +206,22 @@
 
                     <div>
                         <div class="flex justify-between text-slate-400 mb-1">
-                            <span>50 Günlük Hareketli Ortalama</span>
-                            <span class="text-emerald-400 font-medium">Üzerinde ($224.50)</span>
+                            <span>50 Günlük Üstel Ortalama</span>
+                            <span class="text-emerald-400 font-medium" id="ind-ema">Üzerinde (+%2.8)</span>
                         </div>
                         <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                            <div class="bg-brandBlue h-2 rounded-full" style="width: 85%"></div>
+                            <div class="bg-brandBlue h-2 rounded-full" style="width: 82%"></div>
                         </div>
                     </div>
 
                     <div class="pt-2 border-t border-borderBg grid grid-cols-2 gap-2 text-xs">
                         <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
-                            <span class="text-slate-400 block">Güçlü Destek</span>
-                            <span class="text-white font-bold text-sm">$228.00</span>
+                            <span class="text-slate-400 block">Momentum Durumu</span>
+                            <span class="text-white font-bold text-sm">Yüksek Hacimli</span>
                         </div>
                         <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
-                            <span class="text-slate-400 block">Güçlü Direnç</span>
-                            <span class="text-white font-bold text-sm">$238.50</span>
+                            <span class="text-slate-400 block">Volatilite Endeksi</span>
+                            <span class="text-white font-bold text-sm">Normal (Düşük Risk)</span>
                         </div>
                     </div>
                 </div>
@@ -238,18 +232,18 @@
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-bold text-white flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-4 h-4 text-brandBlue"></i>
-                            Yatırımcı Analiz Notları & Değerlendirme
+                            <i data-lucide="brain" class="w-4 h-4 text-accentPurple"></i>
+                            TrAIder Yapay Zeka Otomatik Analiz Notları
                         </h3>
                         <span class="text-xs text-slate-400" id="reportDate">Tarih: 13.10.2026</span>
                     </div>
-                    <textarea id="userCommentary" rows="4" class="w-full bg-slate-900/80 border border-borderBg rounded-xl p-3.5 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-brandBlue transition resize-none" placeholder="Buraya teknik analiz notlarınızı yazabilirsiniz. PDF çıktısına otomatik olarak eklenecektir...">Apple (AAPL) hissesi yükselen kanal içerisindeki formasyonunu koruyor. 228$ desteği üzerinde kaldığı sürece yukarı yönlü momentumun devam etmesi ve 238.50$ direnç seviyesinin test edilmesi beklenmektedir.</textarea>
+                    <textarea id="userCommentary" rows="4" class="w-full bg-slate-900/80 border border-borderBg rounded-xl p-3.5 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-brandBlue transition resize-none">Seçili varlık üzerinde hacim artışı ve kısa vadeli yükselen trend kanalı gözlemlenmektedir. Teknik göstergeler alım iştahının korunduğuna işaret etmektedir.</textarea>
                 </div>
 
                 <div class="flex items-center justify-between pt-3 border-t border-borderBg text-xs text-slate-400">
-                    <span>💡 İpucu: PDF raporu tüm verileri ve notlarınızı tek sayfada özetler.</span>
+                    <span>💡 İpucu: Bu terminal üzerinden seçtiğiniz tüm enstrümanların raporunu PDF olarak indirebilirsiniz.</span>
                     <button onclick="exportReportToPDF()" class="bg-brandBlue/10 hover:bg-brandBlue/20 text-brandBlue border border-brandBlue/30 font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                        <i data-lucide="download" class="w-3.5 h-3.5">Raporu Kaydet</i>
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Raporu Kaydet
                     </button>
                 </div>
             </div>
@@ -259,9 +253,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-borderBg bg-[#0b0f19] py-4 mt-8">
+    <footer class="border-t border-borderBg bg-[#090d16] py-4 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            <p>© 2026 StockPulse Analytics Terminal. Tüm hakları saklıdır. Veriler TradingView altyapısıyla sağlanmaktadır.</p>
+            <p>© 2026 TrAIder Financial Terminal. Tüm hakları saklıdır. Yapay zeka destekli piyasa simülasyonu.</p>
         </div>
     </footer>
 
@@ -273,11 +267,107 @@
 
     <!-- Application Script Logic -->
     <script>
-        // Initialize Lucide Icons on load
+        let currentSymbol = 'NASDAQ:AAPL';
+        let currentAssetName = 'Apple Inc (AAPL)';
+
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             document.getElementById('reportDate').innerText = `Tarih: ${new Date().toLocaleDateString('tr-TR')}`;
+            loadTradingViewWidget(currentSymbol);
         });
+
+        // Load TrAIder Widget Dynamically based on Symbol
+        function loadTradingViewWidget(symbol) {
+            const container = document.getElementById('tvContainerElement');
+            // Clear previous widget script
+            container.innerHTML = `
+                <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+                <div class="tradingview-widget-copyright" style="padding: 4px 8px; font-size: 11px; background: #0F0F0F; color: #888;">
+                    <span class="trademark">&nbsp;TrAIder tarafından</span> 
+                    <a href="https://tr.tradingview.com/symbols/${symbol}/" rel="noopener nofollow" target="_blank"><span class="blue-text" style="color: #3b82f6;">${symbol} Grafiği</span></a>
+                </div>
+            `;
+
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+            script.async = true;
+            script.innerHTML = JSON.stringify({
+                "allow_symbol_change": true,
+                "calendar": false,
+                "details": false,
+                "hide_side_toolbar": true,
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "hide_volume": false,
+                "hotlist": false,
+                "interval": "D",
+                "locale": "tr",
+                "save_image": true,
+                "style": "1",
+                "symbol": symbol,
+                "theme": "dark",
+                "timezone": "Europe/Istanbul",
+                "backgroundColor": "#0F0F0F",
+                "gridColor": "rgba(242, 242, 242, 0.2)",
+                "watchlist": [],
+                "withdateranges": false,
+                "compareSymbols": [],
+                "support_host": "https://yusufturudu.github.io/TrAIder/",
+                "studies": [],
+                "autosize": true
+            });
+            container.appendChild(script);
+        }
+
+        // Change Symbol logic
+        function changeSymbol(symbol, name) {
+            currentSymbol = symbol;
+            currentAssetName = name;
+            
+            // Update active button styles
+            document.querySelectorAll('.symbol-btn').forEach(btn => {
+                btn.className = 'symbol-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-cardBg hover:bg-slate-800 text-slate-300 border border-borderBg';
+            });
+            
+            const btnId = `btn-${symbol.split(':').pop().replace('USDT', '')}`;
+            const activeBtn = document.getElementById(btnId);
+            if (activeBtn) {
+                activeBtn.className = 'symbol-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-brandBlue text-white shadow-lg shadow-blue-500/20';
+            }
+
+            // Update Header & Widget
+            document.getElementById('lbl-assetName').innerText = name;
+            document.getElementById('chart-title').innerText = `${name} - TrAIder Canlı Gelişmiş Grafik`;
+            
+            loadTradingViewWidget(symbol);
+            showToast(`${name} grafiği yüklendi.`);
+        }
+
+        // Custom Symbol Input Handler
+        function applyCustomSymbol() {
+            const input = document.getElementById('customSymbolInput');
+            const val = input.value.trim().toUpperCase();
+            if (val) {
+                currentSymbol = val.includes(':') ? val : `NASDAQ:${val}`;
+                currentAssetName = currentSymbol;
+                document.getElementById('lbl-assetName').innerText = currentAssetName;
+                document.getElementById('chart-title').innerText = `${currentAssetName} - TradingView Canlı Gelişmiş Grafik`;
+                loadTradingViewWidget(currentSymbol);
+                showToast(`${currentSymbol} sembolü yüklendi.`);
+            }
+        }
+
+        // Refresh Data Animation
+        function refreshData() {
+            const icon = document.getElementById('refreshIcon');
+            icon.classList.add('animate-spin');
+            setTimeout(() => {
+                icon.classList.remove('animate-spin');
+                loadTradingViewWidget(currentSymbol);
+                showToast('Piyasa terminali ve veriler güncellendi.');
+            }, 800);
+        }
 
         // High Quality PDF Report Exporter
         async function exportReportToPDF() {
@@ -288,15 +378,15 @@
                 btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Hazırlanıyor...</span>`;
                 lucide.createIcons();
 
-                showToast('PDF raporu oluşturuluyor, lütfen bekleyin...');
+                showToast('Profesyonel PDF raporu oluşturuluyor...');
 
                 const element = document.getElementById('pdfReportContainer');
                 
                 const opt = {
                     margin:       [0.3, 0.3, 0.3, 0.3],
-                    filename:     `AAPL_Hisse_Analiz_Raporu_${new Date().toISOString().slice(0,10)}.pdf`,
+                    filename:     `TrAIder_${currentSymbol.replace(':', '_')}_Analiz_Raporu_${new Date().toISOString().slice(0,10)}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#0b0f19' },
+                    html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#090d16' },
                     jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
                 };
 
