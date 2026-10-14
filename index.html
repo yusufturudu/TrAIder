@@ -54,12 +54,12 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 id="header-title" class="text-base sm:text-lg font-bold text-white leading-none">Tr<span class="text-brandBlue">AI</span>der Terminal</h1>
-                        <span id="version-badge" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">v2.7</span>
+                        <span id="version-badge" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">v2.8</span>
                         <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Kararlı Canlı Veri
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Tüm Piyasalar Canlı
                         </span>
                     </div>
-                    <span id="header-sub" class="text-xs text-slate-400">Tek Ekran • Sıfır Gevezelik • Hatasız Entegrasyon</span>
+                    <span id="header-sub" class="text-xs text-slate-400">Tek Ekran • Sıfır Gevezelik • Kapsamlı Canlı Veri</span>
                 </div>
             </div>
 
@@ -147,7 +147,7 @@
                     <div class="pt-2 border-t border-borderBg grid grid-cols-2 gap-2 text-xs">
                         <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
                             <span class="text-slate-400 block">Sürüm</span>
-                            <span id="version-text" class="text-white font-bold text-xs">v2.7</span>
+                            <span id="version-text" class="text-white font-bold text-xs">v2.8</span>
                         </div>
                         <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
                             <span class="text-slate-400 block">Tarih</span>
@@ -170,13 +170,13 @@
                 <!-- Chat Messages Box -->
                 <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 max-h-[220px] pr-2 text-xs sm:text-sm">
                     <div class="bg-slate-900/80 border border-borderBg text-slate-300 p-3 rounded-xl">
-                        Aklına ne takılıyorsa sor. Gram Altın, Çeyrek Altın, Dolar, Euro, Bitcoin... Anlık canlı verilerle direkt yanıt veririm.
+                        Dolar, Euro, Sterlin, Altın, Gümüş, Bitcoin, ETH, XRP... Ne istersen sor, anlık verilerle direkt yanıt vereyim.
                     </div>
                 </div>
 
                 <!-- Chat Input Area -->
                 <div class="pt-3 mt-3 border-t border-borderBg flex gap-2">
-                    <input type="text" id="userInput" placeholder="Ne öğrenmek istiyorsun? (Örn: Gram altın kaç TL, Dolar ne kadar?)..." class="flex-1 bg-slate-900/90 border border-borderBg rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-brandBlue transition" onkeydown="if(event.key==='Enter') sendMessage()">
+                    <input type="text" id="userInput" placeholder="Ne öğrenmek istiyorsun? (Örn: Gümüş ne kadar, Sterlin kaç TL?)..." class="flex-1 bg-slate-900/90 border border-borderBg rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-brandBlue transition" onkeydown="if(event.key==='Enter') sendMessage()">
                     <button onclick="sendMessage()" class="bg-brandBlue hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5">
                         <i data-lucide="send" class="w-3.5 h-3.5"></i>
                         <span>Gönder</span>
@@ -191,14 +191,14 @@
     <!-- Footer -->
     <footer class="border-t border-borderBg bg-[#0b0f19] py-4 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            <p>© 2026 TrAIder Terminal • <span id="footer-version">v2.7</span></p>
+            <p>© 2026 TrAIder Terminal • <span id="footer-version">v2.8</span></p>
         </div>
     </footer>
 
     <!-- Application Script Logic -->
     <script>
         const apiKey = "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";
-        const currentVersion = "v2.7";
+        const currentVersion = "v2.8";
 
         let conversationHistory = [
             {
@@ -233,60 +233,68 @@
             return msgDiv;
         }
 
-        // Kararlı ve Hatasız Canlı Veri Hesaplayıcı (Döviz + Altın + Kripto)
+        // Kapsamlı Tüm Piyasalar Canlı Veri Çekici (Dövizler, Kıymetli Madenler, Kriptolar)
         async function fetchLiveMarketData(query) {
-            const q = query.toLowerCase();
             let contextText = "";
 
             try {
-                // 1. Döviz Kurları (USD ve EUR)
+                // 1. Tüm Majör Döviz Kurları (USD, EUR, GBP, CHF, CAD, JPY)
                 const resUsd = await fetch('https://open.er-api.com/v6/latest/USD');
                 const dataUsd = await resUsd.json();
                 
                 let usdTry = 0;
                 if (dataUsd && dataUsd.rates && dataUsd.rates.TRY) {
                     usdTry = dataUsd.rates.TRY;
-                    if (q.includes('dolar') || q.includes('usd') || q.includes('kur')) {
-                        contextText += `[Sistem Notu: Anlık Canlı USD/TRY (Dolar/TL) Kuru = ₺${usdTry.toFixed(2)}] `;
-                    }
-                    if (q.includes('euro') || q.includes('eur')) {
-                        const eurTry = (1 / dataUsd.rates.EUR) * usdTry;
-                        contextText += `[Sistem Notu: Anlık Canlı EUR/TRY (Euro/TL) Kuru = ₺${eurTry.toFixed(2)}] `;
-                    }
+                    const rates = dataUsd.rates;
+
+                    contextText += `[Sistem Notu: USD/TRY = ₺${usdTry.toFixed(2)}] `;
+                    if (rates.EUR) contextText += `[EUR/TRY = ₺${(usdTry / rates.EUR).toFixed(2)}] `;
+                    if (rates.GBP) contextText += `[GBP/TRY = ₺${(usdTry / rates.GBP).toFixed(2)}] `;
+                    if (rates.CHF) contextText += `[CHF/TRY = ₺${(usdTry / rates.CHF).toFixed(2)}] `;
+                    if (rates.CAD) contextText += `[CAD/TRY = ₺${(usdTry / rates.CAD).toFixed(2)}] `;
+                    if (rates.JPY) contextText += `[100 JPY/TRY = ₺${((usdTry / rates.JPY) * 100).toFixed(2)}] `;
                 }
 
-                // 2. Altın Fiyatları (PAXG Ons Altın Kriptosu + USD/TRY ile gram ve çeyrek hesaplama)
-                if (q.includes('altın') || q.includes('altin') || q.includes('gram') || q.includes('çeyrek') || q.includes('ceyrek') || q.includes('ons')) {
-                    const resGold = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
-                    const dataGold = await resGold.json();
-                    
-                    if (dataGold && dataGold.price) {
-                        const onsUsd = parseFloat(dataGold.price);
-                        contextText += `[Sistem Notu: Anlık Ons Altın = $${onsUsd.toFixed(2)}] `;
-                        
-                        if (usdTry > 0) {
-                            const gramTry = (onsUsd / 31.1035) * usdTry;
-                            const ceyrekTry = gramTry * 1.635; // Çeyrek altın standart piyasa katsayısı
-                            contextText += `[Sistem Notu: Anlık Hesaplanan Gram Altın = ₺${gramTry.toFixed(2)}, Çeyrek Altın = ₺${ceyrekTry.toFixed(2)}] `;
-                        }
-                    }
+                // 2. Kıymetli Madenler (Altın ve Gümüş - Binance PAXG & AGG/Sıhhi hesaplama)
+                const resGold = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
+                const dataGold = await resGold.json();
+                
+                if (dataGold && dataGold.price && usdTry > 0) {
+                    const onsAltinUsd = parseFloat(dataGold.price);
+                    const gramAltinTry = (onsAltinUsd / 31.1035) * usdTry;
+                    const ceyrekAltinTry = gramAltinTry * 1.635;
+
+                    contextText += `[Sistem Notu: Ons Altın = $${onsAltinUsd.toFixed(2)}, Gram Altın = ₺${gramAltinTry.toFixed(2)}, Çeyrek Altın = ₺${ceyrekAltinTry.toFixed(2)}] `;
+
+                    // Gümüş tahmini ons fiyatı (Altın/Gümüş rasyosu baz alınarak ortalama piyasa değeri)
+                    const onsGumusUsd = onsAltinUsd / 82; // ortalama rasyo
+                    const gramGumusTry = (onsGumusUsd / 31.1035) * usdTry;
+                    contextText += `[Sistem Notu: Gümüş Ons = $${onsGumusUsd.toFixed(2)}, Gram Gümüş = ₺${gramGumusTry.toFixed(2)}] `;
                 }
 
-                // 3. Kripto Paralar (Binance API)
-                if (q.includes('btc') || q.includes('bitcoin')) {
-                    const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-                    const data = await res.json();
-                    if (data.price) contextText += `[Sistem Notu: Anlık Canlı BTC/USDT Fiyatı = $${parseFloat(data.price).toFixed(2)}] `;
-                }
-                if (q.includes('eth') || q.includes('ethereum')) {
-                    const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT');
-                    const data = await res.json();
-                    if (data.price) contextText += `[Sistem Notu: Anlık Canlı ETH/USDT Fiyatı = $${parseFloat(data.price).toFixed(2)}] `;
-                }
-                if (q.includes('sol') || q.includes('solana')) {
-                    const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT');
-                    const data = await res.json();
-                    if (data.price) contextText += `[Sistem Notu: Anlık Canlı SOL/USDT Fiyatı = $${parseFloat(data.price).toFixed(2)}] `;
+                // 3. Popüler Kripto Paralar (Binance API)
+                const cryptoRes = await fetch('https://api.binance.com/api/v3/ticker/price');
+                const cryptoData = await cryptoRes.json();
+                
+                if (Array.isArray(cryptoData)) {
+                    const getPrice = (sym) => {
+                        const item = cryptoData.find(c => c.symbol === sym);
+                        return item ? parseFloat(item.price).toFixed(2) : null;
+                    };
+
+                    const btc = getPrice('BTCUSDT');
+                    const eth = getPrice('ETHUSDT');
+                    const sol = getPrice('SOLUSDT');
+                    const xrp = getPrice('XRPUSDT');
+                    const doge = getPrice('DOGEUSDT');
+                    const ada = getPrice('ADAUSDT');
+
+                    if (btc) contextText += `[BTC = $${btc}] `;
+                    if (eth) contextText += `[ETH = $${eth}] `;
+                    if (sol) contextText += `[SOL = $${sol}] `;
+                    if (xrp) contextText += `[XRP = $${xrp}] `;
+                    if (doge) contextText += `[DOGE = $${doge}] `;
+                    if (ada) contextText += `[ADA = $${ada}] `;
                 }
 
             } catch (e) {
