@@ -161,9 +161,9 @@
                 <div class="flex items-center justify-between pb-3 border-b border-borderBg mb-3">
                     <h3 class="text-base font-bold text-white flex items-center gap-2">
                         <i data-lucide="message-square" class="w-4 h-4 text-brandBlue"></i>
-                        Piyasa Asistanı (DeepSeek)
+                        Piyasa Asistanı
                     </h3>
-                    <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Aktif</span>
+                    <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Hazır</span>
                 </div>
 
                 <!-- Chat Messages Box -->
@@ -196,7 +196,7 @@
 
     <!-- Application Script Logic -->
     <script>
-        const apiKey = "sk-f7174a0d4b4b493889d8ae4bd90e3737";
+        const apiKey = "AIzaSyAiy4iS6W4Z8Duzc-sLG45ZTv7p-eENkgY";
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
@@ -231,41 +231,49 @@
 
             const loadingDiv = appendMessageToChat('Bakıyorum...', 'ai');
 
-            try {
-                const response = await fetch('https://api.deepseek.com/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: 'deepseek-chat',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: 'Sen resmiyetten uzak, yapmacık kelimeler veya samimiyet kalıpları kullanmayan, doğrudan net konuşan bir piyasa takipçisisin. Kullanıcının sorusu hangi varlıkla ilgili olursa olsun (Altın, Dolar, BIST, Kripto, Hisse vs.) net konuş: Şu kadardı, şu kadar oldu, artacak/düşecek, destek ve direnç şurası de. Uzun paragraf kurma, gevezelik etme, soğuk resmi terimler kullanma. Direkt sonucu söyle.'
-                            },
-                            {
-                                role: 'user',
-                                content: text
-                            }
-                        ],
-                        stream: false
-                    })
-                });
+            const modelsToTry = [
+                'gemini-2.5-flash-lite',
+                'gemini-3.1-flash-lite',
+                'gemini-3.5-flash-lite',
+                'gemini-flash-latest'
+            ];
 
-                const data = await response.json();
+            let success = false;
+            let lastError = "";
 
-                if(response.ok && data.choices && data.choices[0].message && data.choices[0].message.content) {
-                    loadingDiv.className = "bg-slate-900/80 border border-borderBg text-slate-300 p-3 rounded-xl mr-6 whitespace-pre-wrap";
-                    loadingDiv.innerText = data.choices[0].message.content;
-                } else {
-                    loadingDiv.className = "bg-red-500/20 border border-red-500/30 text-red-200 p-3 rounded-xl";
-                    loadingDiv.innerText = `API Hatası: ${data.error ? data.error.message : JSON.stringify(data)}`;
+            for(let model of modelsToTry) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-goog-api-key': apiKey
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: `Sen resmiyetten uzak, yapmacık kelimeler veya samimiyet kalıpları kullanmayan, doğrudan net konuşan bir piyasa takipçisisin. Kullanıcının sorusu: "${text}". Soru hangi varlıkla ilgili olursa olsun (Altın, Dolar, BIST, Kripto, Hisse vs.) net konuş: 'Şu kadardı, şu kadar oldu, artacak/düşecek, destek ve direnç şurası' de. Uzun paragraf kurma, gevezelik etme, soğuk resmi terimler kullanma. Direkt sonucu söyle.` }]
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if(response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+                        loadingDiv.className = "bg-slate-900/80 border border-borderBg text-slate-300 p-3 rounded-xl mr-6 whitespace-pre-wrap";
+                        loadingDiv.innerText = data.candidates[0].content.parts[0].text;
+                        success = true;
+                        break;
+                    } else {
+                        lastError = data.error ? data.error.message : JSON.stringify(data);
+                    }
+                } catch(err) {
+                    lastError = err.message;
                 }
-            } catch(err) {
+            }
+
+            if(!success) {
                 loadingDiv.className = "bg-red-500/20 border border-red-500/30 text-red-200 p-3 rounded-xl";
-                loadingDiv.innerText = `Bağlantı Hatası: ${err.message}`;
+                loadingDiv.innerText = `API Hatası: ${lastError}`;
             }
         }
 
