@@ -2,7 +2,9 @@
 
 Tr**AI**der Terminal; finansal piyasalardaki karmaşık verileri, yapay zeka ve canlı grafik entegrasyonuyla tek ekranda, yalın ve net bir şekilde sunan modern bir finansal analiz platformudur.
 
-![TrAIder Terminal Banner](https://img.shields.io/badge/Status-Active-brightgreen) ![License](https://img.shields.io/badge/License-MIT-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38bdf8) ![Gemini AI](https://img.shields.io/badge/AI-Gemini%20API-4285f4)
+![TrAIder Terminal Banner](https://img.shields.io/badge/Status-Active-brightgreen) ![License](https://img.shields.io/badge/License-MIT-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38bdf8) ![OpenRouter](https://img.shields.io/badge/AI-OpenRouter%20%7C%20Gemini-6366f1) ![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL-336791) ![n8n](https://img.shields.io/badge/Otomasyon-n8n-ea4b71)
+
+![TrAIder Teknik Analiz](docs/screenshots/teknik-analiz.png)
 
 ---
 
@@ -22,14 +24,50 @@ Tr**AI**der Terminal; finansal piyasalardaki karmaşık verileri, yapay zeka ve 
 
 ---
 
-## 🛠️ Teknolojiler
+## 📸 Ekran Görüntüleri
 
-Proje herhangi bir karmaşık derleme adımı gerektirmeden doğrudan tarayıcı üzerinde çalışacak şekilde geliştirilmiştir:
+> Görüntüler örnek verilerle alınmıştır.
+
+### 🤖 Piyasa Asistanı
+Canlı fiyatlarla cevap verir; giriş yapınca sohbetler kaydedilir ve portföyünü bilir.
+
+![Piyasa Asistanı](docs/screenshots/terminal-asistan.png)
+
+### 📈 Teknik Analiz
+Arama çubuğuyla yüzlerce kripto, döviz ve altın; RSI, MACD, SMA, Bollinger, destek/direnç ve yapay zeka yorumu (görsel en üstte).
+
+### 📰 Haberler
+İnternette aranan günün piyasa haberleri; kategori filtresi, piyasa etkisi ve kaynak linkleri.
+
+![Haberler](docs/screenshots/haberler.png)
+
+### 🔁 Çevirici
+TL, döviz, gram/çeyrek altın ve kripto arasında anlık çeviri.
+
+![Çevirici](docs/screenshots/cevirici.png)
+
+### 💼 Portföy & Alarmlar
+Varlık takibi, kâr/zarar, fiyat alarmları ve Telegram bildirim ayarları.
+
+![Portföy](docs/screenshots/portfoy.png)
+
+### 📄 Günlük PDF Rapor
+Grafikler, 24 saatlik değişimler, fiyat tabloları ve yapay zeka özeti. İndirilir, Telegram'a da gönderilir.
+
+<img src="docs/screenshots/pdf-rapor.png" alt="PDF Rapor" width="520">
+
+---
+
+## 🛠️ Teknolojiler
 
 * **HTML5 & JavaScript (ES6+):** Temel yapı ve dinamik mantık.
 * **[Tailwind CSS](https://tailwindcss.com/):** Stil ve responsive (mobil uyumlu) tasarım.
 * **[TradingView Widget](https://www.tradingview.com/):** Gelişmiş canlı grafik altyapısı.
-* **[Google Gemini API](https://ai.google.dev/):** Yapay zeka analiz motoru.
+* **[OpenRouter](https://openrouter.ai/) / [Google Gemini API](https://ai.google.dev/):** Yapay zeka analiz motoru (key `.env`'de, tarayıcıya gitmez).
+* **Node.js (`server.js`):** API anahtarını saklayan, piyasa verilerini çeken ve yapay zekaya bağlanan sunucu.
+* **[PostgreSQL](https://www.postgresql.org/):** Kullanıcılar, portföy, alarmlar, fiyat geçmişi ve sohbet hafızası.
+* **[n8n](https://n8n.io/):** Saatlik fiyat kaydı, alarm kontrolü ve sabah raporu otomasyonları.
+* **[pdfkit](https://pdfkit.org/):** Sunucu tarafında grafikli PDF rapor.
 * **[Lucide Icons](https://lucide.dev/):** Modern vektörel ikon seti.
 * **[html2pdf.js](https://ereyes.github.io/html2pdf.js/):** Ekran görünümünü PDF belgesine dönüştürme kütüphanesi.
 
@@ -40,32 +78,16 @@ Proje herhangi bir karmaşık derleme adımı gerektirmeden doğrudan tarayıcı
 > 🗄️ **Veritabanı ve n8n kurulumu** için adım adım rehber: [KURULUM.md](KURULUM.md). Kısaca: Docker Desktop'ı kur, `.env` dosyasını doldur, `baslat.bat`'a çift tıkla, sonra `n8n-yukle.bat`'ı çalıştır.
 
 
-Projeyi yerel bilgisayarınızda çalıştırmak oldukça basittir:
-
-1. **Depoyu klonlayın veya indirin:**
+1. **Depoyu klonlayın:**
    ```bash
-   git clone https://github.com/kullanici-adi/traider-terminal.git
+   git clone https://github.com/yusufturudu/TrAIder.git
+   cd TrAIder
    ```
+2. **`.env` dosyasını oluşturun:** `.env.example` dosyasını kopyalayıp adını `.env` yapın ve API anahtarınızı yazın. (`.env` GitHub'a gönderilmez.)
+3. **Docker Desktop'ı açın** ve **`baslat.bat`**'a çift tıklayın (veritabanı + n8n + sunucu). Kapatmak için **`durdur.bat`**.
+4. Tarayıcıda **http://localhost:3000** adresini açın.
 
-2. **Dizine gidin:**
-   ```bash
-   cd traider-terminal
-   ```
-
-3. **API anahtarını ekleyin:**
-   `.env.example` dosyasını kopyalayıp adını `.env` yapın, içine Gemini anahtarınızı yazın:
-   ```
-   GEMINI_API_KEY=anahtarınız
-   ```
-   (`.env` dosyası `.gitignore`'da, GitHub'a gönderilmez.)
-
-4. **Çalıştırın** (Node.js 18+ gerekir, ek paket kurulumu yok):
-   ```bash
-   node server.js
-   ```
-   Tarayıcıda `http://localhost:3000` adresini açın.
-
-> ⚠️ **Not:** API anahtarı tarayıcıya hiç gönderilmez; `server.js` okur ve Gemini'ye kendisi istek atar. Bu yüzden sayfayı çift tıklayarak veya Live Server ile değil, `node server.js` ile açın.
+> ⚠️ **Not:** API anahtarı tarayıcıya hiç gönderilmez; `server.js` okur ve yapay zekaya kendisi istek atar. Sayfayı çift tıklayarak değil, sunucu üzerinden açın.
 
 ---
 
