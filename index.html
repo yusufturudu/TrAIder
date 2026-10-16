@@ -61,7 +61,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 id="header-title" class="text-base sm:text-lg font-bold text-white leading-none whitespace-nowrap">Tr<span class="text-brandBlue">AI</span>der Terminal</h1>
-                        <span id="version-badge" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">v2.9</span>
+                        <span id="version-badge" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">v3.0</span>
                         <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full hidden sm:flex items-center gap-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Tüm Piyasalar Canlı
                         </span>
@@ -181,7 +181,7 @@
                     <div class="pt-2 border-t border-borderBg grid grid-cols-2 gap-2 text-xs">
                         <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
                             <span class="text-slate-400 block">Sürüm</span>
-                            <span id="version-text" class="text-white font-bold text-xs">v2.9</span>
+                            <span id="version-text" class="text-white font-bold text-xs">v3.0</span>
                         </div>
                         <div class="bg-slate-900/60 p-2.5 rounded-xl border border-borderBg">
                             <span class="text-slate-400 block">Tarih</span>
@@ -416,7 +416,7 @@
     <!-- Footer -->
     <footer class="border-t border-borderBg bg-[#0b0f19] py-4 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            <p>© 2026 TrAIder Terminal • <span id="footer-version">v2.9</span></p>
+            <p>© 2026 TrAIder Terminal • <span id="footer-version">v3.0</span></p>
         </div>
     </footer>
 
@@ -441,7 +441,7 @@
     <!-- Application Script Logic -->
     <script>
         // API key artık burada değil: .env dosyasında durur, server.js okur.
-        const currentVersion = "v2.9";
+        const currentVersion = "v3.0";
 
         const systemPrompt = 'Sen resmiyetten uzak, yapmacık kelimeler veya samimiyet kalıpları kullanmayan, doğrudan net konuşan bir piyasa takipçisisin. Eğer mesajda [Sistem Notu: ...] şeklinde fiyat bilgisi verilmişse O FİYATLARI DOĞRUDAN KULLAN. "Bilgim yok" veya "undefined" gibi ifadeler KESİNLİKLE KULLANMA. Kullanıcının sorusu hangi varlıkla ilgili olursa olsun net konuş: "Şu an fiyatı şu kadar, destek/direnç şurası" de. Uzun paragraf kurma. Direkt sonucu söyle.';
 
