@@ -43,8 +43,8 @@ const PROVIDER = OR_KEY ? 'openrouter' : (GEMINI_KEY ? 'gemini' : null);
 const list = (v, def) => (v || def).split(',').map(s => s.trim()).filter(Boolean);
 
 // OpenRouter: openrouter/free = o an çalışan ücretsiz bir modele otomatik yönlendirir
-const OR_MODELS = list(process.env.OPENROUTER_MODEL, 'openrouter/free')
-    .concat(list(process.env.OPENROUTER_FALLBACK_MODELS, ''));
+const OR_MODELS = [...new Set(list(process.env.OPENROUTER_MODEL, 'nvidia/nemotron-3.5-super-vl:free')
+    .concat(list(process.env.OPENROUTER_FALLBACK_MODELS, 'openrouter/free')))];
 
 // Gemini: ana model yoğunsa sırayla yedekler denenir
 const GEMINI_MODELS = [...new Set(list(process.env.GEMINI_MODEL, 'gemini-flash-lite-latest')
