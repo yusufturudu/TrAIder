@@ -102,3 +102,8 @@ Grafikler, 24 saatlik değişimler, fiyat tabloları ve yapay zeka özeti. İndi
 ## 📝 Lisans
 
 Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır. Dilediğiniz gibi geliştirebilir ve kullanabilirsiniz.
+
+https://www.linkedin.com/in/ismail-k%C4%B1rg%C4%B1n-752655341/
+https://www.linkedin.com/in/yusuf-turudu/
+https://www.linkedin.com/in/erdem-aydin-05b372390/
+
