@@ -1,7 +1,7 @@
 # ⚡ TrAIder Terminal
 
 Tr**AI**der Terminal; finansal piyasalardaki karmaşık verileri, yapay zeka ve canlı grafik entegrasyonuyla tek ekranda, yalın ve net bir şekilde sunan modern bir finansal analiz platformudur.
-
+Evet çok iyi çalışıyor!!
 ![TrAIder Terminal Banner](https://img.shields.io/badge/Status-Active-brightgreen) ![License](https://img.shields.io/badge/License-MIT-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38bdf8) ![OpenRouter](https://img.shields.io/badge/AI-OpenRouter%20%7C%20Gemini-6366f1) ![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL-336791) ![n8n](https://img.shields.io/badge/Otomasyon-n8n-ea4b71)
 
 ![TrAIder Teknik Analiz](docs/screenshots/teknik-analiz.png)
