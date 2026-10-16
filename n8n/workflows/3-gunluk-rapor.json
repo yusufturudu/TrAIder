@@ -1,0 +1,143 @@
+{
+  "id": "TrAIderGunlukRp1",
+  "name": "TrAIder - Günlük Rapor (Telegram)",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ☀️ Günlük Rapor\nHer sabah 09:00'da fiyatlar, portföy değeri ve yapay zeka özetini, günlük raporu açık olan herkese Telegram'dan gönderir.\n\nSaati değiştirmek için ilk kutuya çift tıkla.",
+        "height": 220,
+        "width": 380
+      },
+      "id": "833b144c-ea25-5245-a027-232adbcd85b6",
+      "name": "Not",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "7d24b9c5-3b2e-5372-9d4d-999f90cce09b",
+      "name": "Her Sabah 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TRAIDER_URL }}/api/n8n/daily-report",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{ $env.N8N_SECRET }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "9dabc519-3744-54fe-912d-56852827cd03",
+      "name": "Raporu Hazırla",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "messages",
+        "options": {}
+      },
+      "id": "059db380-ebd4-5eac-b53c-cc0afa665554",
+      "name": "Mesajları Ayır",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $json.chat_id, text: $json.text, parse_mode: 'HTML', disable_web_page_preview: true }) }}",
+        "options": {}
+      },
+      "id": "23c4c542-2b48-594e-8ecd-465ed100692c",
+      "name": "Telegram'a Gönder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Her Sabah 09:00": {
+      "main": [
+        [
+          {
+            "node": "Raporu Hazırla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raporu Hazırla": {
+      "main": [
+        [
+          {
+            "node": "Mesajları Ayır",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mesajları Ayır": {
+      "main": [
+        [
+          {
+            "node": "Telegram'a Gönder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Istanbul"
+  },
+  "pinData": {}
+}

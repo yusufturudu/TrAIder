@@ -1,0 +1,54 @@
+# TrAIder altyapısı: PostgreSQL (veritabanı) + n8n (otomasyon)
+# Başlatmak için bu klasörde:  docker compose up -d
+# Durdurmak için:              docker compose down
+# Ayarlar aynı klasördeki .env dosyasından okunur.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: traider-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-traider}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-traider}
+      POSTGRES_DB: ${DB_NAME:-traider}
+      TZ: Europe/Istanbul
+    ports:
+      # Bilgisayarında zaten bir PostgreSQL varsa 5432 ile çakışmasın diye 5433 kullanıyoruz
+      - "5433:5432"
+    volumes:
+      - traider_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-traider} -d ${DB_NAME:-traider}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  n8n:
+    image: n8nio/n8n:2.43.6
+    container_name: traider-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      GENERIC_TIMEZONE: Europe/Istanbul
+      TZ: Europe/Istanbul
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      N8N_SECURE_COOKIE: "false"
+      # İş akışları {{ $env.X }} ile bu değişkenleri okuyabilsin (n8n 2.x'te varsayılan olarak kapalı)
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      # TrAIder sunucusu bilgisayarında 3000 portunda çalışıyor; Docker içinden ona bu adresle ulaşılır
+      TRAIDER_URL: ${TRAIDER_URL:-http://host.docker.internal:3000}
+      N8N_SECRET: ${N8N_SECRET}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - traider_n8n:/home/node/.n8n
+      - ./n8n/workflows:/workflows:ro
+
+volumes:
+  traider_pgdata:
+  traider_n8n:

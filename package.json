@@ -1,0 +1,17 @@
+{
+  "name": "traider-terminal",
+  "version": "3.0.0",
+  "description": "TrAIder Terminal - yapay zeka destekli piyasa terminali",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "pdfkit": "^0.17.2",
+    "pg": "^8.13.1"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "id": "TrAIderFiyatKyt1",
+  "name": "TrAIder - Saatlik Fiyat Kaydı",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 💾 Saatlik Fiyat Kaydı\nHer saat başı TrAIder sunucusundan güncel fiyatları alıp veritabanındaki **price_history** tablosuna yazar.\n\nGereken: TrAIder sunucusu açık olmalı (`node server.js`).",
+        "height": 220,
+        "width": 380
+      },
+      "id": "833b144c-ea25-5245-a027-232adbcd85b6",
+      "name": "Not",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "19ff5113-05ec-582d-91be-4a6f7f77d6b5",
+      "name": "Her Saat",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TRAIDER_URL }}/api/n8n/record-prices",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{ $env.N8N_SECRET }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "5ca48cfb-787b-54d9-bc5f-b3eee8b34d56",
+      "name": "Fiyatları Kaydet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Her Saat": {
+      "main": [
+        [
+          {
+            "node": "Fiyatları Kaydet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Istanbul"
+  },
+  "pinData": {}
+}

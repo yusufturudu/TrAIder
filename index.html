@@ -40,6 +40,13 @@
         ::-webkit-scrollbar-track { background: #0b0f19; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
         .glass-card { background: rgba(19, 28, 46, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(30, 41, 59, 0.7); }
+        .tab-btn { display: flex; align-items: center; gap: 6px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #94a3b8; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s, border-color .15s; }
+        .tab-btn:hover { color: #e2e8f0; }
+        .tab-btn.active { color: #ffffff; border-bottom-color: #3b82f6; }
+        [data-tab-panel][hidden] { display: none !important; }
+        .news-chip { font-size: 12px; padding: 5px 12px; border-radius: 999px; border: 1px solid #1e293b; color: #94a3b8; background: rgba(15, 23, 42, .6); transition: all .15s; }
+        .news-chip:hover { color: #e2e8f0; }
+        .news-chip.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
     </style>
 </head>
 <body class="bg-darkBg min-h-screen flex flex-col justify-between antialiased selection:bg-brandBlue selection:text-white">
@@ -53,31 +60,58 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 id="header-title" class="text-base sm:text-lg font-bold text-white leading-none">Tr<span class="text-brandBlue">AI</span>der Terminal</h1>
+                        <h1 id="header-title" class="text-base sm:text-lg font-bold text-white leading-none whitespace-nowrap">Tr<span class="text-brandBlue">AI</span>der Terminal</h1>
                         <span id="version-badge" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">v2.8</span>
-                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full hidden sm:flex items-center gap-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Tüm Piyasalar Canlı
                         </span>
                     </div>
-                    <span id="header-sub" class="text-xs text-slate-400">Tek Ekran • Sıfır Gevezelik • Kapsamlı Canlı Veri</span>
+                    <span id="header-sub" class="text-xs text-slate-400 hidden sm:block">Tek Ekran • Sıfır Gevezelik • Kapsamlı Canlı Veri</span>
                 </div>
             </div>
 
             <!-- Header Action Buttons -->
             <div class="flex items-center space-x-2">
-                <button onclick="window.location.reload()" class="bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-300 text-xs font-medium px-3 py-2 rounded-xl transition" title="Yenile">
+                <button id="account-btn" onclick="onAccountClick()" class="bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Hesap">
+                    <i data-lucide="user" class="w-4 h-4"></i><span id="account-label" class="hidden sm:inline">Giriş Yap</span>
+                </button>
+                <button onclick="window.location.reload()" class="hidden sm:block bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-300 text-xs font-medium px-3 py-2 rounded-xl transition" title="Yenile">
                     <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                 </button>
                 <button onclick="exportReportToPDF()" id="pdfBtn" class="bg-brandBlue hover:bg-blue-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center gap-2">
                     <i data-lucide="file-down" class="w-4 h-4"></i>
-                    <span>PDF İndir</span>
+                    <span class="hidden sm:inline">Günlük Rapor (PDF)</span><span class="sm:hidden">PDF</span>
                 </button>
             </div>
         </div>
+
+        <!-- SEKME ÇUBUĞU
+             Yeni sekme eklemek için: buraya bir <button data-tab="ad"> ekle,
+             <main> içine de aynı adla bir <section data-tab-panel="ad"> ekle. Başka bir şey gerekmez. -->
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 overflow-x-auto" id="tab-bar">
+            <button data-tab="terminal" class="tab-btn">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Terminal
+            </button>
+            <button data-tab="haberler" class="tab-btn">
+                <i data-lucide="newspaper" class="w-4 h-4"></i> Haberler
+            </button>
+            <button data-tab="analiz" class="tab-btn">
+                <i data-lucide="activity" class="w-4 h-4"></i> Teknik Analiz
+            </button>
+            <button data-tab="cevirici" class="tab-btn">
+                <i data-lucide="arrow-left-right" class="w-4 h-4"></i> Çevirici
+            </button>
+            <button data-tab="portfoy" class="tab-btn">
+                <i data-lucide="wallet" class="w-4 h-4"></i> Portföy
+            </button>
+        </nav>
     </header>
 
     <!-- Main Content Wrapper -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-6" id="pdfReportContainer">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow" id="pdfReportContainer">
+
+      <!-- ===== SEKME: TERMINAL ===== -->
+      <section data-tab-panel="terminal" class="space-y-6">
 
         <!-- Chart Section -->
         <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
@@ -167,6 +201,18 @@
                     <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Aktif</span>
                 </div>
 
+                <!-- Sohbet geçmişi (giriş yapınca görünür) -->
+                <div id="conv-bar" class="hidden flex items-center gap-2 mb-3">
+                    <select id="conv-select" class="flex-1 min-w-0 bg-slate-900/90 border border-borderBg rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brandBlue"></select>
+                    <button onclick="newConversation()" class="shrink-0 bg-slate-800 hover:bg-slate-700 border border-borderBg text-slate-200 text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1" title="Yeni sohbet">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Yeni</span>
+                    </button>
+                    <button onclick="deleteConversation()" class="shrink-0 bg-slate-800 hover:bg-red-900/60 border border-borderBg text-slate-300 text-xs px-2.5 py-1.5 rounded-lg" title="Bu sohbeti sil">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+                <p id="conv-hint" class="text-[11px] text-slate-500 mb-2">Giriş yaparsan sohbetlerin kaydedilir ve asistan önceki konuşmaları hatırlar.</p>
+
                 <!-- Chat Messages Box -->
                 <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 max-h-[220px] pr-2 text-xs sm:text-sm">
                     <div class="bg-slate-900/80 border border-borderBg text-slate-300 p-3 rounded-xl">
@@ -186,6 +232,185 @@
 
         </div>
 
+      </section>
+
+      <!-- ===== SEKME: HABERLER ===== -->
+      <section data-tab-panel="haberler" class="space-y-5" hidden>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="newspaper" class="w-5 h-5 text-brandBlue"></i> Piyasayı Etkileyen Haberler
+                </h2>
+                <p id="news-meta" class="text-xs text-slate-400 mt-1">Son 24 saatin önemli gelişmeleri, internette aranarak derleniyor.</p>
+            </div>
+            <button id="news-refresh" onclick="loadNews(true)" class="bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-2 self-start">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> <span>Yenile</span>
+            </button>
+        </div>
+
+        <div id="news-filters" class="flex flex-wrap gap-2"></div>
+        <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div id="news-sources" class="text-xs text-slate-500"></div>
+        <p class="text-[11px] text-slate-600">Haberler yapay zeka tarafından internet araması sonuçlarından özetlenir; yatırım tavsiyesi değildir. Ayrıntı için kaynak linklerine bakın.</p>
+      </section>
+
+
+      <!-- ===== SEKME: TEKNİK ANALİZ ===== -->
+      <section data-tab-panel="analiz" class="space-y-5" hidden>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="activity" class="w-5 h-5 text-brandBlue"></i> Teknik Analiz
+                </h2>
+                <p id="ta-meta" class="text-xs text-slate-400 mt-1">Günlük verilerden hesaplanan göstergeler.</p>
+            </div>
+        </div>
+        <!-- Arama çubuğu -->
+        <div class="relative max-w-xl" id="ta-search-wrap">
+            <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input id="ta-search" type="text" autocomplete="off" spellcheck="false"
+                placeholder="Varlık ara: bitcoin, PEPE, dolar, euro, altın..."
+                class="w-full bg-slate-900/90 border border-borderBg rounded-xl pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-brandBlue transition">
+            <div id="ta-suggest" class="hidden absolute z-40 left-0 right-0 mt-1 bg-[#0f172a] border border-borderBg rounded-xl shadow-2xl max-h-80 overflow-y-auto"></div>
+        </div>
+        <div id="ta-assets" class="flex flex-wrap gap-2"></div>
+
+        <div id="ta-body" class="space-y-5"></div>
+        <p class="text-[11px] text-slate-600">Göstergeler geçmiş fiyatlardan otomatik hesaplanır ve geleceği garanti etmez. Yatırım tavsiyesi değildir.</p>
+      </section>
+
+      <!-- ===== SEKME: ÇEVİRİCİ ===== -->
+      <section data-tab-panel="cevirici" class="space-y-5" hidden>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="arrow-left-right" class="w-5 h-5 text-brandBlue"></i> Çevirici
+                </h2>
+                <p id="cv-meta" class="text-xs text-slate-400 mt-1">Döviz, altın ve kripto arasında anlık çeviri.</p>
+            </div>
+            <button onclick="loadConverter(true)" class="bg-cardBg hover:bg-slate-800 border border-borderBg text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-2 self-start">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> <span>Fiyatları Yenile</span>
+            </button>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-6">
+            <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 md:gap-4 items-end">
+                <div class="space-y-2">
+                    <label class="text-xs text-slate-400">Miktar ve birim</label>
+                    <div class="flex gap-2">
+                        <input id="cv-amount" type="number" inputmode="decimal" min="0" step="any" value="100"
+                            class="w-full min-w-0 bg-slate-900/90 border border-borderBg rounded-xl px-3 py-2.5 text-base text-white focus:outline-none focus:border-brandBlue">
+                        <select id="cv-from" class="bg-slate-900/90 border border-borderBg rounded-xl px-2 py-2.5 text-sm text-white focus:outline-none focus:border-brandBlue max-w-[48%]"></select>
+                    </div>
+                </div>
+                <button id="cv-swap" title="Yer değiştir" class="justify-self-center bg-slate-800 hover:bg-slate-700 border border-borderBg text-slate-200 p-2.5 rounded-xl transition">
+                    <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                </button>
+                <div class="space-y-2">
+                    <label class="text-xs text-slate-400">Karşılığı</label>
+                    <select id="cv-to" class="w-full bg-slate-900/90 border border-borderBg rounded-xl px-2 py-2.5 text-sm text-white focus:outline-none focus:border-brandBlue"></select>
+                </div>
+            </div>
+            <div class="mt-5 pt-5 border-t border-borderBg">
+                <div id="cv-result" class="text-2xl sm:text-3xl font-bold text-white break-words">—</div>
+                <div id="cv-rate" class="text-xs text-slate-400 mt-1"></div>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-5">
+            <h3 class="text-sm font-bold text-white mb-3">Diğer birimlerde karşılığı</h3>
+            <div id="cv-table" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"></div>
+        </div>
+        <p class="text-[11px] text-slate-600">Çeyrek altın ve gümüş değerleri yaklaşık hesaplamadır; kuyumcu fiyatları farklı olabilir.</p>
+      </section>
+
+
+      <!-- ===== SEKME: PORTFÖY ===== -->
+      <section data-tab-panel="portfoy" class="space-y-5" hidden>
+        <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <i data-lucide="wallet" class="w-5 h-5 text-brandBlue"></i> Portföy & Alarmlar
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Varlıklarını takip et, fiyat alarmı kur, Telegram'dan bildirim al.</p>
+        </div>
+
+        <div id="pf-locked" class="glass-card rounded-2xl p-6 text-center space-y-3">
+            <i data-lucide="lock" class="w-8 h-8 text-slate-500 mx-auto"></i>
+            <p id="pf-locked-text" class="text-sm text-slate-300">Portföy ve alarmlar için giriş yapmalısın.</p>
+            <button onclick="openAuth('login')" class="bg-brandBlue hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-xl">Giriş Yap / Kayıt Ol</button>
+        </div>
+
+        <div id="pf-content" class="space-y-5 hidden">
+            <!-- Özet -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="glass-card rounded-2xl p-4"><div class="text-xs text-slate-400">Toplam değer</div><div id="pf-total" class="text-2xl font-bold text-white mt-1">—</div></div>
+                <div class="glass-card rounded-2xl p-4"><div class="text-xs text-slate-400">Toplam kâr / zarar</div><div id="pf-pnl" class="text-2xl font-bold text-white mt-1">—</div><div class="text-[11px] text-slate-500 mt-0.5">Sadece maliyet girilen varlıklar</div></div>
+                <div class="glass-card rounded-2xl p-4"><div class="text-xs text-slate-400">Varlık sayısı</div><div id="pf-count" class="text-2xl font-bold text-white mt-1">—</div></div>
+            </div>
+
+            <!-- Portföy tablosu -->
+            <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-white">Varlıklarım</h3>
+                    <button onclick="loadPortfolio()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Yenile</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs sm:text-sm min-w-[560px]">
+                        <thead><tr class="text-slate-400 text-left border-b border-borderBg">
+                            <th class="py-2 font-medium">Varlık</th><th class="py-2 font-medium text-right">Miktar</th><th class="py-2 font-medium text-right">Fiyat</th>
+                            <th class="py-2 font-medium text-right">Değer (TL)</th><th class="py-2 font-medium text-right">Kâr / Zarar</th><th class="py-2"></th>
+                        </tr></thead>
+                        <tbody id="pf-rows"></tbody>
+                    </table>
+                </div>
+                <form id="pf-form" class="grid grid-cols-2 sm:grid-cols-[1.4fr_1fr_1fr_auto] gap-2 pt-3 border-t border-borderBg">
+                    <select id="pf-asset" class="col-span-2 sm:col-span-1 bg-slate-900/90 border border-borderBg rounded-xl px-2 py-2 text-sm text-white"></select>
+                    <input id="pf-amount" type="text" inputmode="decimal" placeholder="Miktar (ör. 0,05)" class="bg-slate-900/90 border border-borderBg rounded-xl px-3 py-2 text-sm text-white min-w-0">
+                    <input id="pf-cost" type="text" inputmode="decimal" placeholder="Toplam maliyet ₺ (isteğe bağlı)" class="bg-slate-900/90 border border-borderBg rounded-xl px-3 py-2 text-sm text-white min-w-0">
+                    <button class="col-span-2 sm:col-span-1 bg-brandBlue hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-xl">Ekle</button>
+                </form>
+                <p id="pf-msg" class="text-xs text-red-300 hidden"></p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <!-- Alarmlar -->
+                <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4 text-amber-400"></i> Fiyat Alarmları</h3>
+                    <form id="al-form" class="grid grid-cols-2 gap-2">
+                        <select id="al-asset" class="col-span-2 bg-slate-900/90 border border-borderBg rounded-xl px-2 py-2 text-sm text-white"></select>
+                        <select id="al-dir" class="bg-slate-900/90 border border-borderBg rounded-xl px-2 py-2 text-sm text-white">
+                            <option value="above">Üstüne çıkarsa ⬆</option><option value="below">Altına inerse ⬇</option>
+                        </select>
+                        <input id="al-target" type="text" inputmode="decimal" placeholder="Hedef fiyat" class="bg-slate-900/90 border border-borderBg rounded-xl px-3 py-2 text-sm text-white min-w-0">
+                        <p id="al-current" class="col-span-2 text-[11px] text-slate-400"></p>
+                        <button class="col-span-2 bg-amber-500 hover:bg-amber-600 text-slate-900 text-sm font-semibold px-4 py-2 rounded-xl">Alarm Kur</button>
+                    </form>
+                    <p id="al-msg" class="text-xs text-red-300 hidden"></p>
+                    <div id="al-list" class="space-y-2 text-xs"></div>
+                    <p class="text-[11px] text-slate-500">Alarmları n8n her 5 dakikada bir kontrol eder ve Telegram'dan haber verir.</p>
+                </div>
+
+                <!-- Telegram ayarları -->
+                <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="send" class="w-4 h-4 text-sky-400"></i> Telegram Bildirimleri</h3>
+                    <ol class="text-xs text-slate-400 space-y-1 list-decimal list-inside">
+                        <li>Telegram'da kendi TrAIder botunu aç ve <b class="text-slate-200">/start</b> yaz.</li>
+                        <li><b class="text-slate-200">@userinfobot</b>'a yaz; sana "Id" numaranı söyler.</li>
+                        <li>O numarayı aşağıya yazıp kaydet, sonra test mesajı gönder.</li>
+                    </ol>
+                    <input id="tg-chat" type="text" inputmode="numeric" placeholder="Telegram ID (ör. 123456789)" class="w-full bg-slate-900/90 border border-borderBg rounded-xl px-3 py-2 text-sm text-white">
+                    <label class="flex items-center gap-2 text-sm text-slate-300"><input id="tg-daily" type="checkbox" class="accent-blue-500 w-4 h-4"> Her sabah günlük raporu gönder</label>
+                    <div class="flex gap-2">
+                        <button onclick="saveSettings()" class="flex-1 bg-brandBlue hover:bg-blue-600 text-white text-sm font-semibold px-3 py-2 rounded-xl">Kaydet</button>
+                        <button onclick="testTelegram()" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-borderBg text-slate-200 text-sm font-semibold px-3 py-2 rounded-xl">Test mesajı</button>
+                    </div>
+                    <p id="tg-msg" class="text-xs hidden"></p>
+                    <p id="tg-nobot" class="text-[11px] text-amber-300 hidden">Not: .env dosyasında TELEGRAM_BOT_TOKEN yok; önce bot oluşturup token'ı eklemelisin.</p>
+                </div>
+            </div>
+        </div>
+      </section>
+
     </main>
 
     <!-- Footer -->
@@ -195,17 +420,33 @@
         </div>
     </footer>
 
+
+    <!-- Giriş / kayıt penceresi -->
+    <div id="auth-modal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 id="auth-title" class="text-lg font-bold text-white">Giriş Yap</h3>
+                <button onclick="closeAuth()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="auth-form" class="space-y-3">
+                <input id="auth-user" type="text" autocomplete="username" placeholder="Kullanıcı adı" class="w-full bg-slate-900/90 border border-borderBg rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brandBlue">
+                <input id="auth-pass" type="password" autocomplete="current-password" placeholder="Şifre (en az 6 karakter)" class="w-full bg-slate-900/90 border border-borderBg rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brandBlue">
+                <p id="auth-msg" class="text-xs text-red-300 hidden"></p>
+                <button id="auth-submit" class="w-full bg-brandBlue hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl">Giriş Yap</button>
+            </form>
+            <p class="text-xs text-slate-400 text-center"><span id="auth-switch-text">Hesabın yok mu?</span> <button id="auth-switch" class="text-blue-400 hover:underline">Kayıt ol</button></p>
+        </div>
+    </div>
+
     <!-- Application Script Logic -->
     <script>
-        const apiKey = "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";
+        // API key artık burada değil: .env dosyasında durur, server.js okur.
         const currentVersion = "v2.8";
 
-        let conversationHistory = [
-            {
-                role: 'system',
-                content: 'Sen resmiyetten uzak, yapmacık kelimeler veya samimiyet kalıpları kullanmayan, doğrudan net konuşan bir piyasa takipçisisin. Eğer mesajda [Sistem Notu: ...] şeklinde fiyat bilgisi verilmişse O FİYATLARI DOĞRUDAN KULLAN. "Bilgim yok" veya "undefined" gibi ifadeler KESİNLİKLE KULLANMA. Kullanıcının sorusu hangi varlıkla ilgili olursa olsun net konuş: "Şu an fiyatı şu kadar, destek/direnç şurası" de. Uzun paragraf kurma. Direkt sonucu söyle.'
-            }
-        ];
+        const systemPrompt = 'Sen resmiyetten uzak, yapmacık kelimeler veya samimiyet kalıpları kullanmayan, doğrudan net konuşan bir piyasa takipçisisin. Eğer mesajda [Sistem Notu: ...] şeklinde fiyat bilgisi verilmişse O FİYATLARI DOĞRUDAN KULLAN. "Bilgim yok" veya "undefined" gibi ifadeler KESİNLİKLE KULLANMA. Kullanıcının sorusu hangi varlıkla ilgili olursa olsun net konuş: "Şu an fiyatı şu kadar, destek/direnç şurası" de. Uzun paragraf kurma. Direkt sonucu söyle.';
+
+        // Gemini formatında sohbet geçmişi: { role: 'user' | 'model', parts: [{ text }] }
+        let conversationHistory = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
@@ -213,6 +454,7 @@
             document.getElementById('version-badge').innerText = currentVersion;
             document.getElementById('version-text').innerText = currentVersion;
             document.getElementById('footer-version').innerText = currentVersion;
+            showTab(location.hash.slice(1) || 'terminal');
         });
 
         function appendMessageToChat(text, sender) {
@@ -233,75 +475,30 @@
             return msgDiv;
         }
 
-        // Kapsamlı Tüm Piyasalar Canlı Veri Çekici (Dövizler, Kıymetli Madenler, Kriptolar)
-        async function fetchLiveMarketData(query) {
-            let contextText = "";
-
+        // Tüm piyasa verilerini sunucudan alır (server.js çeker; tarayıcı engellerine takılmaz)
+        async function getMarketSnapshot() {
             try {
-                // 1. Tüm Majör Döviz Kurları (USD, EUR, GBP, CHF, CAD, JPY)
-                const resUsd = await fetch('https://open.er-api.com/v6/latest/USD');
-                const dataUsd = await resUsd.json();
-                
-                let usdTry = 0;
-                if (dataUsd && dataUsd.rates && dataUsd.rates.TRY) {
-                    usdTry = dataUsd.rates.TRY;
-                    const rates = dataUsd.rates;
-
-                    contextText += `[Sistem Notu: USD/TRY = ₺${usdTry.toFixed(2)}] `;
-                    if (rates.EUR) contextText += `[EUR/TRY = ₺${(usdTry / rates.EUR).toFixed(2)}] `;
-                    if (rates.GBP) contextText += `[GBP/TRY = ₺${(usdTry / rates.GBP).toFixed(2)}] `;
-                    if (rates.CHF) contextText += `[CHF/TRY = ₺${(usdTry / rates.CHF).toFixed(2)}] `;
-                    if (rates.CAD) contextText += `[CAD/TRY = ₺${(usdTry / rates.CAD).toFixed(2)}] `;
-                    if (rates.JPY) contextText += `[100 JPY/TRY = ₺${((usdTry / rates.JPY) * 100).toFixed(2)}] `;
-                }
-
-                // 2. Kıymetli Madenler (Altın ve Gümüş - Binance PAXG & AGG/Sıhhi hesaplama)
-                const resGold = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
-                const dataGold = await resGold.json();
-                
-                if (dataGold && dataGold.price && usdTry > 0) {
-                    const onsAltinUsd = parseFloat(dataGold.price);
-                    const gramAltinTry = (onsAltinUsd / 31.1035) * usdTry;
-                    const ceyrekAltinTry = gramAltinTry * 1.635;
-
-                    contextText += `[Sistem Notu: Ons Altın = $${onsAltinUsd.toFixed(2)}, Gram Altın = ₺${gramAltinTry.toFixed(2)}, Çeyrek Altın = ₺${ceyrekAltinTry.toFixed(2)}] `;
-
-                    // Gümüş tahmini ons fiyatı (Altın/Gümüş rasyosu baz alınarak ortalama piyasa değeri)
-                    const onsGumusUsd = onsAltinUsd / 82; // ortalama rasyo
-                    const gramGumusTry = (onsGumusUsd / 31.1035) * usdTry;
-                    contextText += `[Sistem Notu: Gümüş Ons = $${onsGumusUsd.toFixed(2)}, Gram Gümüş = ₺${gramGumusTry.toFixed(2)}] `;
-                }
-
-                // 3. Popüler Kripto Paralar (Binance API)
-                const cryptoRes = await fetch('https://api.binance.com/api/v3/ticker/price');
-                const cryptoData = await cryptoRes.json();
-                
-                if (Array.isArray(cryptoData)) {
-                    const getPrice = (sym) => {
-                        const item = cryptoData.find(c => c.symbol === sym);
-                        return item ? parseFloat(item.price).toFixed(2) : null;
-                    };
-
-                    const btc = getPrice('BTCUSDT');
-                    const eth = getPrice('ETHUSDT');
-                    const sol = getPrice('SOLUSDT');
-                    const xrp = getPrice('XRPUSDT');
-                    const doge = getPrice('DOGEUSDT');
-                    const ada = getPrice('ADAUSDT');
-
-                    if (btc) contextText += `[BTC = $${btc}] `;
-                    if (eth) contextText += `[ETH = $${eth}] `;
-                    if (sol) contextText += `[SOL = $${sol}] `;
-                    if (xrp) contextText += `[XRP = $${xrp}] `;
-                    if (doge) contextText += `[DOGE = $${doge}] `;
-                    if (ada) contextText += `[ADA = $${ada}] `;
-                }
-
+                const d = await (await fetch('/api/market')).json();
+                return d.snap || { fx: [], metals: [], crypto: [], usdTry: 0 };
             } catch (e) {
-                console.log("Canlı veri alınamadı:", e);
+                console.log('Piyasa verisi alınamadı:', e);
+                return { fx: [], metals: [], crypto: [], usdTry: 0 };
             }
+        }
 
-            return contextText;
+        // Veriyi yapay zekanın okuyacağı yazıya çevirir
+        function snapshotToText(snap) {
+            const fmt = (x) => x.value.toFixed(2);
+            const ch = (x) => (typeof x.change === 'number' && !isNaN(x.change)) ? ` (24s: ${x.change >= 0 ? '+' : ''}${x.change.toFixed(2)}%)` : '';
+            let t = '';
+            if (snap.fx.length) t += '[Sistem Notu: Döviz: ' + snap.fx.map(x => `${x.name} = ₺${fmt(x)}`).join(', ') + '] ';
+            if (snap.metals.length) t += '[Sistem Notu: Madenler: ' + snap.metals.map(x => `${x.name} = ${x.unit}${fmt(x)}${ch(x)}`).join(', ') + '] ';
+            if (snap.crypto.length) t += '[Sistem Notu: Kripto: ' + snap.crypto.map(x => `${x.name} = $${fmt(x)}${ch(x)}`).join(', ') + '] ';
+            return t;
+        }
+
+        async function fetchLiveMarketData() {
+            return snapshotToText(await getMarketSnapshot());
         }
 
         async function sendMessage() {
@@ -314,69 +511,1049 @@
 
             const loadingDiv = appendMessageToChat('Canlı veriler taranıyor...', 'ai');
 
-            const liveDataInfo = await fetchLiveMarketData(text);
+            const liveDataInfo = await fetchLiveMarketData();
             const promptText = liveDataInfo ? `${liveDataInfo} Kullanıcı Sorusu: ${text}` : text;
 
-            conversationHistory.push({
-                role: 'user',
-                content: promptText
-            });
+            // Giriş yapılmışsa: geçmiş sunucuda (veritabanında) tutulur, asistan önceki konuşmayı hatırlar
+            if (currentUser) {
+                loadingDiv.innerText = 'Yanıt hazırlanıyor...';
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ system: systemPrompt, message: text, liveData: liveDataInfo, conversationId: currentConvId })
+                    });
+                    const data = await response.json();
+                    if (data.conversationId) currentConvId = data.conversationId;
+                    loadConversations(); // listeyi ve mesaj sayısını güncelle
+                    if (response.ok && data.text) {
+                        loadingDiv.className = "bg-slate-900/80 border border-borderBg text-slate-300 p-3 rounded-xl mr-6 whitespace-pre-wrap";
+                        loadingDiv.innerText = data.text;
+                    } else {
+                        loadingDiv.className = "bg-red-500/20 border border-red-500/30 text-red-200 p-3 rounded-xl";
+                        loadingDiv.innerText = `API Hatası: ${data.error || JSON.stringify(data)}`;
+                    }
+                } catch (err) {
+                    loadingDiv.className = "bg-red-500/20 border border-red-500/30 text-red-200 p-3 rounded-xl";
+                    loadingDiv.innerText = `Bağlantı Hatası: ${err.message}`;
+                }
+                return;
+            }
+
+            conversationHistory.push({ role: 'user', parts: [{ text: promptText }] });
+            loadingDiv.innerText = 'Yanıt hazırlanıyor...';
 
             try {
-                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                const response = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`,
-                        'HTTP-Referer': window.location.origin,
-                        'X-Title': 'TrAIder Terminal'
-                    },
-                    body: JSON.stringify({
-                        model: 'dots-studio/dots-3-note-preview:free',
-                        messages: conversationHistory,
-                        reasoning: { effort: "medium" }
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ system: systemPrompt, contents: conversationHistory })
                 });
 
                 const data = await response.json();
 
-                if (response.ok && data.choices && data.choices[0].message) {
-                    const assistantMessage = data.choices[0].message;
-                    conversationHistory.push(assistantMessage);
+                if (response.ok && data.text) {
+                    conversationHistory.push({ role: 'model', parts: [{ text: data.text }] });
 
                     loadingDiv.className = "bg-slate-900/80 border border-borderBg text-slate-300 p-3 rounded-xl mr-6 whitespace-pre-wrap";
-                    loadingDiv.innerText = assistantMessage.content;
+                    loadingDiv.innerText = data.text;
                 } else {
+                    conversationHistory.pop(); // başarısız soruyu geçmişten çıkar
                     loadingDiv.className = "bg-red-500/20 border border-red-500/30 text-red-200 p-3 rounded-xl";
-                    loadingDiv.innerText = `API Hatası: ${data.error ? data.error.message : JSON.stringify(data)}`;
+                    loadingDiv.innerText = `API Hatası: ${data.error || JSON.stringify(data)}`;
                 }
             } catch (err) {
+                conversationHistory.pop();
                 loadingDiv.className = "bg-red-500/20 border border-red-500/30 text-red-200 p-3 rounded-xl";
-                loadingDiv.innerText = `Bağlantı Hatası: ${err.message}`;
+                loadingDiv.innerText = location.protocol === 'file:'
+                    ? 'Sayfayı çift tıklayarak açmışsın. Terminalde "node server.js" çalıştırıp http://localhost:3000 adresinden aç.'
+                    : `Bağlantı Hatası: ${err.message}`;
             }
+        }
+
+        // ---------- SEKMELER ----------
+        // Sekme butonları data-tab="ad", paneller data-tab-panel="ad". Adres çubuğunda #ad görünür (yenileyince aynı sekme açılır).
+        const tabHandlers = {
+            haberler: () => loadNews(false),   // sekme açıldığında çalışacak fonksiyon (isteğe bağlı)
+            analiz: () => {
+                loadSymbols();
+                if (!window.__taLast) return loadAnalysis();
+                const c = document.getElementById('ta-canvas');   // gizliyken pencere boyutu değiştiyse yeniden çiz
+                if (c) drawTaChart(c, window.__taLast.chart, window.__taLast.unit);
+            },
+            cevirici: () => loadConverter(false),
+            portfoy: () => { if (currentUser) { loadPortfolio(); loadAlerts(); } }
+        };
+
+        function showTab(name) {
+            const panels = document.querySelectorAll('[data-tab-panel]');
+            if (![...panels].some(p => p.dataset.tabPanel === name)) name = 'terminal';
+            panels.forEach(p => p.hidden = p.dataset.tabPanel !== name);
+            document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+            if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name);
+            if (tabHandlers[name]) tabHandlers[name]();
+        }
+
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-tab]');
+            if (btn) showTab(btn.dataset.tab);
+        });
+        window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+
+        // ---------- HABERLER SEKMESİ ----------
+        let newsData = null, newsFilter = 'Tümü', newsLoading = false;
+        const NEWS_CATS = ['Tümü', 'Türkiye', 'Dünya', 'Kripto', 'Emtia', 'Döviz'];
+
+        function newsImpactColor(etki) {
+            const t = String(etki || '');
+            if (t.includes('↑') && !t.includes('↓')) return 'text-emerald-400';
+            if (t.includes('↓') && !t.includes('↑')) return 'text-red-400';
+            return 'text-blue-300';
+        }
+
+        function renderNews() {
+            const list = document.getElementById('news-list');
+            const filters = document.getElementById('news-filters');
+            const sourcesEl = document.getElementById('news-sources');
+            const items = (newsData?.haberler || []);
+
+            filters.innerHTML = NEWS_CATS.map(c => `<button class="news-chip ${c === newsFilter ? 'active' : ''}" data-cat="${c}">${c}</button>`).join('');
+            filters.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => { newsFilter = b.dataset.cat; renderNews(); });
+
+            const shown = newsFilter === 'Tümü' ? items : items.filter(n => (n.kategori || '').toLowerCase() === newsFilter.toLowerCase());
+            if (!shown.length) {
+                list.innerHTML = `<div class="glass-card rounded-2xl p-5 text-sm text-slate-400 md:col-span-2">${items.length ? 'Bu kategoride haber yok.' : 'Haber bulunamadı.'}</div>`;
+            } else {
+                list.innerHTML = shown.map(n => `
+                    <article class="glass-card rounded-2xl p-4 space-y-2 border-l-4 border-l-brandBlue">
+                        <div class="flex items-center justify-between gap-2 text-[11px]">
+                            <span class="bg-blue-500/10 text-blue-300 border border-blue-500/20 px-2 py-0.5 rounded-full">${esc(n.kategori || 'Genel')}</span>
+                            <span class="text-slate-500">${esc(n.kaynak || '')}</span>
+                        </div>
+                        <h3 class="text-sm sm:text-base font-bold text-white leading-snug">${esc(n.baslik)}</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${esc(n.ozet)}</p>
+                        ${n.etki ? `<p class="text-xs font-semibold ${newsImpactColor(n.etki)}">Piyasa etkisi: ${esc(n.etki)}</p>` : ''}
+                    </article>`).join('');
+            }
+
+            const src = newsData?.sources || [];
+            sourcesEl.innerHTML = src.length
+                ? '<span class="font-semibold text-slate-400">Kaynaklar: </span>' + src.map(s => `<a href="${esc(s.uri)}" target="_blank" rel="noopener" class="text-blue-400 hover:underline">${esc(s.title)}</a>`).join(' • ')
+                : '';
+            lucide.createIcons();
+        }
+
+        async function loadNews(force) {
+            if (newsLoading || (newsData && !force)) return;
+            newsLoading = true;
+            const list = document.getElementById('news-list');
+            const meta = document.getElementById('news-meta');
+            const btn = document.getElementById('news-refresh');
+            btn.disabled = true;
+            list.innerHTML = Array.from({ length: 4 }, () => `
+                <div class="glass-card rounded-2xl p-4 space-y-3 animate-pulse">
+                    <div class="h-3 w-20 bg-slate-700 rounded"></div>
+                    <div class="h-4 w-3/4 bg-slate-700 rounded"></div>
+                    <div class="h-3 w-full bg-slate-800 rounded"></div>
+                    <div class="h-3 w-5/6 bg-slate-800 rounded"></div>
+                </div>`).join('');
+            meta.textContent = 'Haberler internette aranıyor... (10-30 saniye sürebilir)';
+
+            try {
+                const res = await fetch('/api/news' + (force ? '?refresh=1' : ''));
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Haberler alınamadı');
+                newsData = data;
+                const t = new Date(data.updatedAt);
+                meta.textContent = `Son güncelleme: ${t.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} • ${data.haberler.length} haber`;
+                renderNews();
+            } catch (e) {
+                newsData = null;
+                meta.textContent = 'Haberler alınamadı.';
+                list.innerHTML = `<div class="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-2xl text-sm md:col-span-2">${esc(e.message)}<br><span class="text-xs text-red-300/70">Birkaç dakika sonra "Yenile" ile tekrar dene.</span></div>`;
+            } finally {
+                newsLoading = false;
+                btn.disabled = false;
+            }
+        }
+
+        // ---------- ÇEVİRİCİ SEKMESİ ----------
+        // Her birimin 1 adedinin TL karşılığı: tryValue. Çeviri: miktar × from.tryValue / to.tryValue
+        let cvUnits = null;
+
+        function buildUnits(snap) {
+            const u = [{ id: 'TRY', label: 'Türk Lirası (TL)', sym: '₺', tryValue: 1 }];
+            const fxNames = { 'USD/TRY': ['USD', 'Amerikan Doları', '$'], 'EUR/TRY': ['EUR', 'Euro', '€'], 'GBP/TRY': ['GBP', 'İngiliz Sterlini', '£'], 'CHF/TRY': ['CHF', 'İsviçre Frangı', 'CHF '], 'CAD/TRY': ['CAD', 'Kanada Doları', 'CA$'] };
+            for (const f of snap.fx) {
+                if (fxNames[f.name]) { const [id, label, sym] = fxNames[f.name]; u.push({ id, label: `${label} (${id})`, sym, tryValue: f.value }); }
+                if (f.name === '100 JPY/TRY') u.push({ id: 'JPY', label: 'Japon Yeni (JPY)', sym: '¥', tryValue: f.value / 100 });
+            }
+            const metal = (name) => snap.metals.find(m => m.name === name);
+            const usd = snap.usdTry;
+            const gram = metal('Gram Altın'), ceyrek = metal('Çeyrek Altın'), ons = metal('Ons Altın'), gGumus = metal('Gram Gümüş (tahmini)');
+            if (gram) u.push({ id: 'GAU', label: 'Gram Altın', sym: '', suffix: ' gr altın', tryValue: gram.value });
+            if (ceyrek) u.push({ id: 'CEYREK', label: 'Çeyrek Altın', sym: '', suffix: ' çeyrek', tryValue: ceyrek.value });
+            if (ons && usd) u.push({ id: 'XAU', label: 'Ons Altın', sym: '', suffix: ' ons altın', tryValue: ons.value * usd });
+            if (gGumus) u.push({ id: 'GAG', label: 'Gram Gümüş (tahmini)', sym: '', suffix: ' gr gümüş', tryValue: gGumus.value });
+            if (usd) for (const c of snap.crypto) u.push({ id: c.name, label: c.name, sym: '', suffix: ' ' + c.name, tryValue: c.value * usd });
+            return u;
+        }
+
+        function fmtAmount(v, unit) {
+            const abs = Math.abs(v);
+            const digits = abs === 0 ? 2 : abs < 0.0001 ? 8 : abs < 0.01 ? 6 : abs < 1 ? 4 : abs < 1000 ? 2 : 2;
+            const num = v.toLocaleString('tr-TR', { minimumFractionDigits: abs >= 1 ? 2 : 0, maximumFractionDigits: digits });
+            return `${unit.sym || ''}${num}${unit.suffix || ''}`;
+        }
+
+        function runConvert() {
+            if (!cvUnits) return;
+            const amount = parseFloat(String(document.getElementById('cv-amount').value).replace(',', '.')) || 0;
+            const from = cvUnits.find(x => x.id === document.getElementById('cv-from').value);
+            const to = cvUnits.find(x => x.id === document.getElementById('cv-to').value);
+            if (!from || !to) return;
+            const result = amount * from.tryValue / to.tryValue;
+            document.getElementById('cv-result').textContent = `${fmtAmount(amount, from)} = ${fmtAmount(result, to)}`;
+            document.getElementById('cv-rate').textContent = `1 ${from.label} = ${fmtAmount(from.tryValue / to.tryValue, to)}`;
+
+            const showcase = ['TRY', 'USD', 'EUR', 'GBP', 'GAU', 'CEYREK', 'BTC', 'ETH'].filter(id => id !== from.id);
+            document.getElementById('cv-table').innerHTML = showcase.map(id => {
+                const u = cvUnits.find(x => x.id === id);
+                if (!u) return '';
+                return `<button data-to="${u.id}" class="text-left bg-slate-900/60 hover:bg-slate-800/80 border border-borderBg rounded-xl p-3 transition">
+                    <div class="text-[11px] text-slate-400">${esc(u.label)}</div>
+                    <div class="text-sm font-semibold text-white break-words">${esc(fmtAmount(amount * from.tryValue / u.tryValue, u))}</div>
+                </button>`;
+            }).join('');
+            document.querySelectorAll('#cv-table [data-to]').forEach(b => b.onclick = () => { document.getElementById('cv-to').value = b.dataset.to; runConvert(); });
+        }
+
+        async function loadConverter(force) {
+            if (cvUnits && !force) return runConvert();
+            const meta = document.getElementById('cv-meta');
+            meta.textContent = 'Fiyatlar alınıyor...';
+            const snap = await getMarketSnapshot();
+            if (!snap.usdTry) {
+                meta.textContent = 'Fiyatlar alınamadı. İnternet bağlantını kontrol edip "Fiyatları Yenile"ye bas.';
+                return;
+            }
+            const fromSel = document.getElementById('cv-from'), toSel = document.getElementById('cv-to');
+            const prevFrom = fromSel.value || 'USD', prevTo = toSel.value || 'TRY';
+            cvUnits = buildUnits(snap);
+            const opts = cvUnits.map(u => `<option value="${u.id}">${esc(u.label)}</option>`).join('');
+            fromSel.innerHTML = opts; toSel.innerHTML = opts;
+            fromSel.value = cvUnits.some(u => u.id === prevFrom) ? prevFrom : 'USD';
+            toSel.value = cvUnits.some(u => u.id === prevTo) ? prevTo : 'TRY';
+            meta.textContent = `Fiyatlar: ${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} itibarıyla`;
+            runConvert();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ['cv-amount', 'cv-from', 'cv-to'].forEach(id => document.getElementById(id).addEventListener('input', runConvert));
+            document.getElementById('cv-swap').onclick = () => {
+                const f = document.getElementById('cv-from'), t = document.getElementById('cv-to');
+                [f.value, t.value] = [t.value, f.value];
+                runConvert();
+            };
+        });
+
+        // ---------- TEKNİK ANALİZ SEKMESİ ----------
+        const TA_LIST = [['BTC', 'BTC'], ['ETH', 'ETH'], ['SOL', 'SOL'], ['XRP', 'XRP'], ['DOGE', 'DOGE'], ['ADA', 'ADA'], ['GOLD', 'Altın'], ['USDTRY', 'USD/TRY']];
+        let taAsset = 'BTC', taReq = 0;
+
+        function renderTaAssets() {
+            document.getElementById('ta-assets').innerHTML = TA_LIST.map(([id, label]) =>
+                `<button class="news-chip ${id === taAsset ? 'active' : ''}" data-asset="${id}">${label}</button>`).join('');
+            document.querySelectorAll('#ta-assets [data-asset]').forEach(b => b.onclick = () => { taAsset = b.dataset.asset; renderTaAssets(); loadAnalysis(); });
+        }
+
+        // Çok küçük fiyatlarda (ör. PEPE $0,00001234) anlamlı basamak sayısına göre göster
+        const smartNum = (v) => {
+            const a = Math.abs(v);
+            if (a === 0) return '0';
+            if (a < 1) return v.toLocaleString('tr-TR', { maximumSignificantDigits: 4 });
+            return v.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: a < 10 ? 4 : 2 });
+        };
+        const taFmt = (v, unit) => v === null || v === undefined || isNaN(v) ? '—' : unit + smartNum(v);
+        const taPct = v => v === null || v === undefined || isNaN(v) ? '<span class="text-slate-500">—</span>'
+            : `<span class="${v >= 0 ? 'text-emerald-400' : 'text-red-400'} font-semibold">${v >= 0 ? '+' : ''}${v.toFixed(2)}%</span>`;
+
+        // ---- Arama çubuğu ----
+        let taSymbols = null, taSuggestIdx = 0, taSuggestItems = [];
+        const trLower = t => String(t).toLocaleLowerCase('tr-TR').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c');
+
+        async function loadSymbols() {
+            if (taSymbols) return;
+            try {
+                const d = await (await fetch('/api/symbols')).json();
+                taSymbols = (d.items || []).map(it => ({ ...it, _s: trLower(`${it.label} ${it.name || ''} ${it.keywords || ''}`) }));
+            } catch { taSymbols = []; }
+        }
+
+        function searchSymbols(q) {
+            const t = trLower(q.trim());
+            if (!t || !taSymbols) return [];
+            const starts = [], contains = [];
+            for (const it of taSymbols) {
+                const lbl = trLower(it.label);
+                if (lbl === t || lbl.startsWith(t) || trLower(it.name || '').startsWith(t)) starts.push(it);
+                else if (it._s.includes(t)) contains.push(it);
+                if (starts.length > 30) break;
+            }
+            return [...starts, ...contains].slice(0, 12);
+        }
+
+        function renderSuggest() {
+            const box = document.getElementById('ta-suggest');
+            const q = document.getElementById('ta-search').value;
+            if (!q.trim()) { box.classList.add('hidden'); return; }
+            if (!taSymbols) { box.innerHTML = '<div class="px-3 py-2 text-xs text-slate-400">Liste yükleniyor...</div>'; box.classList.remove('hidden'); return; }
+            taSuggestItems = searchSymbols(q);
+            taSuggestIdx = Math.min(taSuggestIdx, Math.max(taSuggestItems.length - 1, 0));
+            const typeCls = { Kripto: 'text-amber-300 bg-amber-500/10', 'Döviz': 'text-sky-300 bg-sky-500/10', Emtia: 'text-yellow-300 bg-yellow-500/10' };
+            box.innerHTML = taSuggestItems.length
+                ? taSuggestItems.map((it, i) => `
+                    <button data-id="${esc(it.id)}" data-label="${esc(it.label)}" class="w-full flex items-center justify-between gap-3 px-3 py-2 text-left text-sm ${i === taSuggestIdx ? 'bg-blue-500/15' : 'hover:bg-slate-800/70'}">
+                        <span class="min-w-0 truncate"><b class="text-white">${esc(it.label)}</b> <span class="text-slate-400">${esc(it.name || '')}</span></span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full shrink-0 ${typeCls[it.type] || 'text-slate-300 bg-slate-500/10'}">${esc(it.type)}</span>
+                    </button>`).join('')
+                : '<div class="px-3 py-2 text-xs text-slate-400">Sonuç yok. Kripto için sembolü yaz (ör. PEPE), döviz için kodu (ör. EUR).</div>';
+            box.classList.remove('hidden');
+            box.querySelectorAll('[data-id]').forEach(b => b.onmousedown = (e) => { e.preventDefault(); pickAsset(b.dataset.id); });
+        }
+
+        function pickAsset(id) {
+            taAsset = id;
+            const inp = document.getElementById('ta-search');
+            inp.value = ''; inp.blur();
+            document.getElementById('ta-suggest').classList.add('hidden');
+            loadAnalysis();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inp = document.getElementById('ta-search');
+            inp.addEventListener('focus', () => { loadSymbols().then(renderSuggest); });
+            inp.addEventListener('input', () => { taSuggestIdx = 0; renderSuggest(); });
+            inp.addEventListener('blur', () => setTimeout(() => document.getElementById('ta-suggest').classList.add('hidden'), 150));
+            inp.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') { e.preventDefault(); taSuggestIdx = Math.min(taSuggestIdx + 1, taSuggestItems.length - 1); renderSuggest(); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); taSuggestIdx = Math.max(taSuggestIdx - 1, 0); renderSuggest(); }
+                else if (e.key === 'Escape') { inp.value = ''; renderSuggest(); inp.blur(); }
+                else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (taSuggestItems[taSuggestIdx]) return pickAsset(taSuggestItems[taSuggestIdx].id);
+                    // listede yoksa: yazılanı doğrudan Binance sembolü olarak dene (ör. "abc" → ABCUSDT)
+                    const raw = inp.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    if (raw) pickAsset(raw.endsWith('USDT') ? raw : raw + 'USDT');
+                }
+            });
+        });
+
+        // Koyu temalı fiyat grafiği: kapanış + SMA20 + SMA50 + Bollinger bandı, altında RSI
+        function drawTaChart(canvas, ch, unit) {
+            const W = canvas.clientWidth || 800, H = 356;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr; canvas.height = H * dpr; canvas.style.height = H + 'px';
+            const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, W, H);
+            const padL = 8, padR = 70, top = 10, priceH = 220, rsiTop = 276, rsiH = 70;
+            const n = ch.close.length;
+            const vals = [...ch.close, ...ch.bbU, ...ch.bbL, ...ch.s20, ...ch.s50].filter(v => v !== null && !isNaN(v));
+            const min = Math.min(...vals), max = Math.max(...vals), range = (max - min) || 1;
+            const x = i => padL + (i / (n - 1)) * (W - padL - padR);
+            const y = v => top + (1 - (v - min) / range) * priceH;
+
+            ctx.font = '11px Inter, Arial'; ctx.textBaseline = 'middle';
+            for (let i = 0; i <= 4; i++) {
+                const v = min + range * i / 4, yy = y(v);
+                ctx.strokeStyle = 'rgba(148,163,184,0.12)'; ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W - padR, yy); ctx.stroke();
+                ctx.fillStyle = '#64748b'; ctx.fillText(taFmt(v, unit), W - padR + 6, yy);
+            }
+            // Bollinger bandı (dolgu)
+            ctx.beginPath(); let started = false;
+            ch.bbU.forEach((v, i) => { if (v === null) return; started ? ctx.lineTo(x(i), y(v)) : (ctx.moveTo(x(i), y(v)), started = true); });
+            for (let i = n - 1; i >= 0; i--) if (ch.bbL[i] !== null) ctx.lineTo(x(i), y(ch.bbL[i]));
+            ctx.closePath(); ctx.fillStyle = 'rgba(59,130,246,0.08)'; ctx.fill();
+
+            const line = (arr, color, w, dash) => {
+                ctx.beginPath(); let s = false;
+                arr.forEach((v, i) => { if (v === null) return; s ? ctx.lineTo(x(i), y(v)) : (ctx.moveTo(x(i), y(v)), s = true); });
+                ctx.strokeStyle = color; ctx.lineWidth = w; ctx.setLineDash(dash || []); ctx.stroke(); ctx.setLineDash([]);
+            };
+            line(ch.s50, '#a855f7', 1.4, [4, 3]);
+            line(ch.s20, '#f59e0b', 1.4);
+            line(ch.close, '#e2e8f0', 2);
+            ctx.beginPath(); ctx.arc(x(n - 1), y(ch.close[n - 1]), 3.5, 0, Math.PI * 2); ctx.fillStyle = '#ffffff'; ctx.fill();
+
+            // RSI paneli
+            const ry = v => rsiTop + (1 - v / 100) * rsiH;
+            ctx.fillStyle = 'rgba(148,163,184,0.06)'; ctx.fillRect(padL, ry(70), W - padL - padR, ry(30) - ry(70));
+            [30, 70].forEach(lv => {
+                ctx.strokeStyle = 'rgba(148,163,184,0.25)'; ctx.setLineDash([3, 3]);
+                ctx.beginPath(); ctx.moveTo(padL, ry(lv)); ctx.lineTo(W - padR, ry(lv)); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#64748b'; ctx.fillText(String(lv), W - padR + 6, ry(lv));
+            });
+            ctx.beginPath(); let rs = false;
+            ch.rsi.forEach((v, i) => { if (v === null) return; rs ? ctx.lineTo(x(i), ry(v)) : (ctx.moveTo(x(i), ry(v)), rs = true); });
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5; ctx.stroke();
+            ctx.fillStyle = '#94a3b8'; ctx.textBaseline = 'bottom'; ctx.fillText('RSI 14', padL + 2, rsiTop - 4); ctx.textBaseline = 'middle';
+
+            // Tarihler
+            const d = t => new Date(t).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
+            ctx.fillStyle = '#64748b'; ctx.textBaseline = 'top';
+            ctx.textAlign = 'left'; ctx.fillText(d(ch.t[0]), padL, top + priceH + 6);
+            ctx.textAlign = 'right'; ctx.fillText(d(ch.t[n - 1]), W - padR, top + priceH + 6);
+            ctx.textAlign = 'left';
+        }
+
+        function taSummaryText(d) {
+            const u = d.unit, f = v => taFmt(v, u);
+            return [
+                `Varlık: ${d.label}`, `Son fiyat: ${f(d.last)}`,
+                `Değişim: 1 gün ${d.change.d1?.toFixed(2)}%, 7 gün ${d.change.d7?.toFixed(2)}%, 30 gün ${d.change.d30?.toFixed(2)}%`,
+                `SMA20: ${f(d.sma.s20)}, SMA50: ${f(d.sma.s50)}, SMA200: ${f(d.sma.s200)}`,
+                `RSI(14): ${d.rsi?.toFixed(1)}`,
+                `MACD: ${d.macd.line == null ? '—' : smartNum(d.macd.line)}, sinyal: ${d.macd.signal == null ? '—' : smartNum(d.macd.signal)}`,
+                `Bollinger: alt ${f(d.bollinger.lower)}, orta ${f(d.bollinger.mid)}, üst ${f(d.bollinger.upper)}`,
+                d.pivots ? `Pivot: P ${f(d.pivots.P)}, S1 ${f(d.pivots.S1)}, S2 ${f(d.pivots.S2)}, R1 ${f(d.pivots.R1)}, R2 ${f(d.pivots.R2)}` : '',
+                `30 günlük en düşük (destek): ${f(d.support30)}, en yüksek (direnç): ${f(d.resistance30)}`,
+                `Günlük oynaklık: %${d.volatility.toFixed(2)}`,
+                `Genel teknik görünüm: ${d.verdict} (skor ${d.score})`
+            ].filter(Boolean).join('\n');
+        }
+
+        async function loadAnalysis() {
+            const reqId = ++taReq;
+            const body = document.getElementById('ta-body');
+            const meta = document.getElementById('ta-meta');
+            renderTaAssets();
+            meta.textContent = 'Veriler alınıyor ve göstergeler hesaplanıyor...';
+            body.innerHTML = `<div class="glass-card rounded-2xl p-5 animate-pulse h-[420px]"></div>`;
+
+            let d;
+            try {
+                const res = await fetch('/api/analysis?asset=' + taAsset);
+                d = await res.json();
+                if (!res.ok) throw new Error(d.error || 'Analiz yapılamadı');
+            } catch (e) {
+                if (reqId !== taReq) return;
+                meta.textContent = 'Analiz yapılamadı.';
+                body.innerHTML = `<div class="bg-red-500/10 border border-red-500/30 text-red-200 p-4 rounded-2xl text-sm">${esc(e.message)}</div>`;
+                return;
+            }
+            if (reqId !== taReq) return; // bu arada başka varlık seçildiyse eski cevabı gösterme
+
+            const u = d.unit, f = v => taFmt(v, u);
+            const verdictCls = d.verdict === 'Pozitif' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                : d.verdict === 'Negatif' ? 'bg-red-500/15 text-red-300 border-red-500/30' : 'bg-slate-500/15 text-slate-300 border-slate-500/30';
+            const sigIcon = s => s > 0 ? '<span class="text-emerald-400">▲</span>' : s < 0 ? '<span class="text-red-400">▼</span>' : '<span class="text-slate-500">●</span>';
+            const rsiCls = d.rsi > 70 ? 'text-red-400' : d.rsi < 30 ? 'text-emerald-400' : 'text-white';
+            const card = (label, value, sub = '') => `<div class="bg-slate-900/60 border border-borderBg rounded-xl p-3">
+                <div class="text-[11px] text-slate-400">${label}</div><div class="text-sm font-bold text-white mt-0.5">${value}</div>${sub ? `<div class="text-[11px] text-slate-500 mt-0.5">${sub}</div>` : ''}</div>`;
+
+            meta.textContent = `${d.days} günlük veri • ${new Date(d.updatedAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} itibarıyla`;
+            body.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div class="lg:col-span-2 glass-card rounded-2xl p-4 sm:p-5 space-y-3">
+                        <div class="flex flex-wrap items-end justify-between gap-2">
+                            <div>
+                                <div class="text-xs text-slate-400">${esc(d.label)}</div>
+                                <div class="text-2xl font-bold text-white">${f(d.last)}</div>
+                            </div>
+                            <div class="flex gap-3 text-xs">
+                                <div>1G ${taPct(d.change.d1)}</div><div>7G ${taPct(d.change.d7)}</div><div>30G ${taPct(d.change.d30)}</div>
+                            </div>
+                        </div>
+                        <canvas id="ta-canvas" class="w-full block"></canvas>
+                        <div class="flex flex-wrap gap-4 text-[11px] text-slate-400">
+                            <span><span class="inline-block w-3 h-0.5 bg-slate-200 align-middle mr-1"></span>Fiyat</span>
+                            <span><span class="inline-block w-3 h-0.5 bg-amber-500 align-middle mr-1"></span>SMA 20</span>
+                            <span><span class="inline-block w-3 h-0.5 bg-purple-500 align-middle mr-1"></span>SMA 50</span>
+                            <span><span class="inline-block w-3 h-2 bg-blue-500/20 align-middle mr-1"></span>Bollinger bandı</span>
+                            <span class="text-slate-500">Son 90 gün</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-white">Teknik Görünüm</h3>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full border ${verdictCls}">${d.verdict}</span>
+                        </div>
+                        <ul class="space-y-2 text-xs">
+                            ${d.signals.map(s => `<li class="flex gap-2"><span class="w-4 shrink-0">${sigIcon(s.score)}</span><span><b class="text-slate-200">${s.name}:</b> <span class="text-slate-400">${esc(s.text)}</span></span></li>`).join('')}
+                        </ul>
+                        <div class="pt-3 border-t border-borderBg">
+                            <div class="text-xs font-semibold text-slate-300 mb-2">Destek / Direnç</div>
+                            <div class="space-y-1 text-xs">
+                                ${d.pivots ? `
+                                <div class="flex justify-between"><span class="text-red-300">Direnç 2 (R2)</span><span class="text-white">${f(d.pivots.R2)}</span></div>
+                                <div class="flex justify-between"><span class="text-red-300">Direnç 1 (R1)</span><span class="text-white">${f(d.pivots.R1)}</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Pivot</span><span class="text-white">${f(d.pivots.P)}</span></div>
+                                <div class="flex justify-between"><span class="text-emerald-300">Destek 1 (S1)</span><span class="text-white">${f(d.pivots.S1)}</span></div>
+                                <div class="flex justify-between"><span class="text-emerald-300">Destek 2 (S2)</span><span class="text-white">${f(d.pivots.S2)}</span></div>` : ''}
+                                <div class="flex justify-between pt-1"><span class="text-slate-400">30 gün en yüksek</span><span class="text-white">${f(d.resistance30)}</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">30 gün en düşük</span><span class="text-white">${f(d.support30)}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    ${card('RSI (14)', `<span class="${rsiCls}">${d.rsi?.toFixed(1) ?? '—'}</span>`, d.rsi > 70 ? 'Aşırı alınmış' : d.rsi < 30 ? 'Aşırı satılmış' : '30-70 arası nötr')}
+                    ${card('MACD', d.macd.line == null ? '—' : smartNum(d.macd.line), `Sinyal: ${d.macd.signal == null ? '—' : smartNum(d.macd.signal)}`)}
+                    ${card('SMA 50 / 200', f(d.sma.s50), `200 gün: ${f(d.sma.s200)}`)}
+                    ${card('Günlük oynaklık', '%' + d.volatility.toFixed(2), 'Son 30 gün')}
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-2">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-brandBlue"></i> Yapay Zeka Yorumu</h3>
+                    <div id="ta-ai" class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed"><span class="text-slate-500 animate-pulse">Göstergeler yorumlanıyor...</span></div>
+                </div>`;
+            lucide.createIcons();
+            const canvas = document.getElementById('ta-canvas');
+            drawTaChart(canvas, d.chart, u);
+            window.__taLast = d;
+
+            // Yapay zeka yorumu (ayrı istek; grafik beklemeden görünür)
+            try {
+                const res = await fetch('/api/analysis/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ summary: taSummaryText(d) }) });
+                const ai = await res.json();
+                if (reqId !== taReq) return;
+                document.getElementById('ta-ai').textContent = res.ok ? ai.text : `Yorum alınamadı: ${ai.error}`;
+            } catch (e) {
+                if (reqId === taReq) document.getElementById('ta-ai').textContent = 'Yorum alınamadı.';
+            }
+        }
+
+        // Pencere boyutu değişince grafiği yeniden çiz
+        window.addEventListener('resize', () => {
+            const c = document.getElementById('ta-canvas');
+            if (c && window.__taLast && !c.closest('[hidden]')) drawTaChart(c, window.__taLast.chart, window.__taLast.unit);
+        });
+
+        // =====================================================================
+        // HESAP, PORTFÖY, ALARMLAR, SOHBET GEÇMİŞİ
+        // =====================================================================
+        let currentUser = null, currentConvId = null, authMode = 'login', appMeta = { assets: {} };
+
+        async function api(path, opts = {}) {
+            const res = await fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || `Hata (${res.status})`);
+            return data;
+        }
+        const showMsg = (id, text, ok = false) => {
+            const el = document.getElementById(id);
+            el.textContent = text; el.classList.toggle('hidden', !text);
+            el.classList.toggle('text-emerald-300', ok); el.classList.toggle('text-red-300', !ok);
+        };
+
+        async function loadMe() {
+            try {
+                appMeta = await api('/api/me');
+            } catch { appMeta = { user: null, db: false, assets: {} }; }
+            currentUser = appMeta.user;
+            renderAccount();
+        }
+
+        function renderAccount() {
+            document.getElementById('account-label').textContent = currentUser ? currentUser.username : 'Giriş Yap';
+            document.getElementById('conv-bar').classList.toggle('hidden', !currentUser);
+            document.getElementById('conv-hint').classList.toggle('hidden', !!currentUser || !appMeta.db);
+            document.getElementById('pf-locked').classList.toggle('hidden', !!currentUser);
+            document.getElementById('pf-content').classList.toggle('hidden', !currentUser);
+            document.getElementById('pf-locked-text').textContent = appMeta.db
+                ? 'Portföy ve alarmlar için giriş yapmalısın.'
+                : `Veritabanı kapalı: ${appMeta.dbError || ''}`;
+
+            // varlık listeleri
+            const opts = Object.entries(appMeta.assets || {}).map(([k, a]) => `<option value="${k}">${esc(a.label)}</option>`).join('');
+            ['pf-asset', 'al-asset'].forEach(id => { const el = document.getElementById(id); if (el.options.length === 0) el.innerHTML = opts; });
+
+            if (currentUser) {
+                document.getElementById('tg-chat').value = currentUser.telegram_chat_id || '';
+                document.getElementById('tg-daily').checked = currentUser.daily_report !== false;
+                document.getElementById('tg-nobot').classList.toggle('hidden', !!appMeta.telegramBot);
+                loadConversations();
+                if (location.hash === '#portfoy') { loadPortfolio(); loadAlerts(); }
+            }
+            lucide.createIcons();
+        }
+
+        function onAccountClick() {
+            if (!currentUser) return openAuth('login');
+            if (confirmLogout()) logout();
+        }
+        // Tarayıcı onay penceresi yerine butonla çift tıklama mantığı (2 sn içinde tekrar basınca çıkış)
+        let logoutArmed = 0;
+        function confirmLogout() {
+            const lbl = document.getElementById('account-label');
+            if (Date.now() - logoutArmed < 2500) return true;
+            logoutArmed = Date.now();
+            lbl.textContent = 'Çıkış için tekrar bas';
+            lbl.className = 'inline';
+            setTimeout(() => { lbl.className = 'hidden sm:inline'; if (currentUser) lbl.textContent = currentUser.username; }, 2500);
+            return false;
+        }
+
+        function openAuth(mode) {
+            if (!appMeta.db) { appendMessageToChat(`Giriş sistemi için veritabanı gerekli. ${appMeta.dbError || ''}`, 'error'); showTab('terminal'); return; }
+            authMode = mode;
+            document.getElementById('auth-title').textContent = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+            document.getElementById('auth-submit').textContent = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+            document.getElementById('auth-switch-text').textContent = mode === 'login' ? 'Hesabın yok mu?' : 'Zaten hesabın var mı?';
+            document.getElementById('auth-switch').textContent = mode === 'login' ? 'Kayıt ol' : 'Giriş yap';
+            document.getElementById('auth-pass').autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+            showMsg('auth-msg', '');
+            document.getElementById('auth-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('auth-user').focus(), 50);
+        }
+        function closeAuth() { document.getElementById('auth-modal').classList.add('hidden'); }
+
+        async function logout() {
+            await api('/api/logout', { method: 'POST' }).catch(() => {});
+            currentUser = null; currentConvId = null;
+            resetChatBox();
+            renderAccount();
+        }
+
+        // --- Sohbet geçmişi ---
+        function resetChatBox() {
+            conversationHistory = [];
+            document.getElementById('chat-messages').innerHTML = `<div class="bg-slate-900/80 border border-borderBg text-slate-300 p-3 rounded-xl">Dolar, Euro, Sterlin, Altın, Gümüş, Bitcoin, ETH, XRP... Ne istersen sor, anlık verilerle direkt yanıt vereyim.</div>`;
+        }
+
+        async function loadConversations() {
+            if (!currentUser) return;
+            try {
+                const d = await api('/api/conversations');
+                const sel = document.getElementById('conv-select');
+                sel.innerHTML = `<option value="">＋ Yeni sohbet</option>` + d.items.map(c =>
+                    `<option value="${c.id}">${esc(c.title)} (${c.count} mesaj)</option>`).join('');
+                sel.value = currentConvId ? String(currentConvId) : '';
+            } catch { /* sessiz */ }
+        }
+
+        async function openConversation(id) {
+            currentConvId = id || null;
+            resetChatBox();
+            if (!id) return;
+            try {
+                const d = await api('/api/conversations/' + id);
+                const box = document.getElementById('chat-messages');
+                box.innerHTML = '';
+                if (d.hasSummary) {
+                    const n = document.createElement('div');
+                    n.className = 'text-[11px] text-slate-500 text-center';
+                    n.textContent = '— Eski mesajlar özetlendi; asistan onları hâlâ hatırlıyor —';
+                    box.appendChild(n);
+                }
+                d.items.forEach(m => appendMessageToChat(m.content, m.role === 'user' ? 'user' : 'ai'));
+            } catch (e) { appendMessageToChat(e.message, 'error'); }
+        }
+        function newConversation() { document.getElementById('conv-select').value = ''; openConversation(null); }
+        let delArmed = 0;
+        async function deleteConversation() {
+            if (!currentConvId) return;
+            if (Date.now() - delArmed > 2500) { delArmed = Date.now(); appendMessageToChat('Bu sohbeti silmek için çöp kutusuna 2 saniye içinde tekrar bas.', 'error'); return; }
+            await api('/api/conversations/' + currentConvId, { method: 'DELETE' }).catch(() => {});
+            currentConvId = null; resetChatBox(); loadConversations();
+        }
+
+        // --- Portföy ---
+        const fmtTL = v => v === null || v === undefined || isNaN(v) ? '—' : '₺' + v.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const pnlHtml = (v, pct) => v === null || v === undefined ? '<span class="text-slate-500">—</span>'
+            : `<span class="${v >= 0 ? 'text-emerald-400' : 'text-red-400'} font-semibold">${v >= 0 ? '+' : ''}${fmtTL(v)}${pct !== null && pct !== undefined ? ` <span class="text-[11px]">(${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)</span>` : ''}</span>`;
+
+        async function loadPortfolio() {
+            if (!currentUser) return;
+            const rows = document.getElementById('pf-rows');
+            try {
+                const d = await api('/api/portfolio');
+                document.getElementById('pf-total').textContent = fmtTL(d.total);
+                document.getElementById('pf-pnl').innerHTML = pnlHtml(d.pnl, d.pnlPct);
+                document.getElementById('pf-count').textContent = d.items.length;
+                rows.innerHTML = d.items.length ? d.items.map(i => `
+                    <tr class="border-b border-borderBg/60">
+                        <td class="py-2.5 text-white font-medium">${esc(i.label)}</td>
+                        <td class="py-2.5 text-right text-slate-300">${i.amount.toLocaleString('tr-TR', { maximumFractionDigits: 8 })}</td>
+                        <td class="py-2.5 text-right text-slate-300">${i.price === null ? '—' : taFmt(i.price, i.unit)}</td>
+                        <td class="py-2.5 text-right text-white font-semibold">${fmtTL(i.value)}</td>
+                        <td class="py-2.5 text-right">${pnlHtml(i.pnl, i.pnlPct)}</td>
+                        <td class="py-2.5 text-right"><button onclick="deletePf(${i.id})" class="text-slate-500 hover:text-red-400" title="Sil"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
+                    </tr>`).join('')
+                    : `<tr><td colspan="6" class="py-4 text-center text-slate-500">Henüz varlık eklemedin. Aşağıdan ekleyebilirsin.</td></tr>`;
+                lucide.createIcons();
+            } catch (e) { rows.innerHTML = `<tr><td colspan="6" class="py-4 text-red-300">${esc(e.message)}</td></tr>`; }
+        }
+        async function deletePf(id) { await api('/api/portfolio/' + id, { method: 'DELETE' }).catch(() => {}); loadPortfolio(); }
+
+        // --- Alarmlar ---
+        async function loadAlerts() {
+            if (!currentUser) return;
+            const list = document.getElementById('al-list');
+            try {
+                const d = await api('/api/alerts');
+                window.__alertPrices = Object.fromEntries(d.items.map(a => [a.asset, a.current]));
+                list.innerHTML = d.items.length ? d.items.map(a => `
+                    <div class="flex items-center justify-between gap-2 bg-slate-900/60 border border-borderBg rounded-xl px-3 py-2 ${a.active ? '' : 'opacity-60'}">
+                        <div class="min-w-0">
+                            <div class="text-slate-200 font-semibold truncate">${esc(a.label)} ${a.direction === 'above' ? '⬆ üstüne' : '⬇ altına'} ${taFmt(a.target, a.unit)}</div>
+                            <div class="text-[11px] ${a.active ? 'text-slate-500' : 'text-emerald-400'}">${a.active
+                                ? `Bekliyor • şu an ${a.current === null ? '—' : taFmt(a.current, a.unit)}`
+                                : `Tetiklendi: ${new Date(a.triggered_at).toLocaleString('tr-TR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })} (${taFmt(a.triggered_price, a.unit)})`}</div>
+                        </div>
+                        <button onclick="deleteAlert(${a.id})" class="text-slate-500 hover:text-red-400 shrink-0" title="Sil"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>`).join('')
+                    : '<p class="text-slate-500">Henüz alarm yok.</p>';
+                lucide.createIcons();
+                updateAlertHint();
+            } catch (e) { list.innerHTML = `<p class="text-red-300">${esc(e.message)}</p>`; }
+        }
+        async function deleteAlert(id) { await api('/api/alerts/' + id, { method: 'DELETE' }).catch(() => {}); loadAlerts(); }
+
+        async function updateAlertHint() {
+            const asset = document.getElementById('al-asset').value;
+            const meta = appMeta.assets?.[asset];
+            if (!meta) return;
+            const el = document.getElementById('al-current');
+            el.textContent = `Hedefi ${meta.unit === '$' ? 'dolar ($)' : 'TL (₺)'} olarak yaz.`;
+            try {
+                const snap = await getMarketSnapshot();
+                const p = currentPriceOf(asset, snap);
+                if (p !== null) el.textContent = `Şu anki fiyat: ${taFmt(p, meta.unit)} • Hedefi ${meta.unit === '$' ? 'dolar ($)' : 'TL (₺)'} olarak yaz.`;
+            } catch { }
+        }
+        function currentPriceOf(asset, snap) {
+            const c = snap.crypto.find(x => x.name === asset); if (c) return c.value;
+            const m = n => snap.metals.find(x => x.name === n)?.value ?? null;
+            const f = n => snap.fx.find(x => x.name === n)?.value ?? null;
+            return { GOLD: m('Ons Altın'), GAU: m('Gram Altın'), CEYREK: m('Çeyrek Altın'), USD: f('USD/TRY'), EUR: f('EUR/TRY'), GBP: f('GBP/TRY') }[asset] ?? null;
+        }
+
+        // --- Telegram ---
+        async function saveSettings() {
+            try {
+                await api('/api/settings', { method: 'POST', body: JSON.stringify({ telegram_chat_id: document.getElementById('tg-chat').value, daily_report: document.getElementById('tg-daily').checked }) });
+                currentUser.telegram_chat_id = document.getElementById('tg-chat').value.trim() || null;
+                currentUser.daily_report = document.getElementById('tg-daily').checked;
+                showMsg('tg-msg', 'Kaydedildi ✓', true);
+            } catch (e) { showMsg('tg-msg', e.message); }
+        }
+        async function testTelegram() {
+            showMsg('tg-msg', 'Gönderiliyor...', true);
+            try { await api('/api/telegram/test', { method: 'POST' }); showMsg('tg-msg', 'Test mesajı gönderildi, Telegram\'ı kontrol et ✓', true); }
+            catch (e) { showMsg('tg-msg', e.message); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('auth-switch').onclick = () => openAuth(authMode === 'login' ? 'register' : 'login');
+            document.getElementById('auth-modal').addEventListener('click', e => { if (e.target.id === 'auth-modal') closeAuth(); });
+            document.getElementById('auth-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('auth-submit');
+                btn.disabled = true;
+                try {
+                    const d = await api(authMode === 'login' ? '/api/login' : '/api/register', {
+                        method: 'POST', body: JSON.stringify({ username: document.getElementById('auth-user').value, password: document.getElementById('auth-pass').value })
+                    });
+                    currentUser = d.user; currentConvId = null;
+                    document.getElementById('auth-pass').value = '';
+                    closeAuth(); resetChatBox(); renderAccount();
+                } catch (err) { showMsg('auth-msg', err.message); }
+                finally { btn.disabled = false; }
+            });
+            document.getElementById('conv-select').addEventListener('change', e => openConversation(parseInt(e.target.value, 10) || null));
+            document.getElementById('pf-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    await api('/api/portfolio', { method: 'POST', body: JSON.stringify({ asset: document.getElementById('pf-asset').value, amount: document.getElementById('pf-amount').value, cost_try: document.getElementById('pf-cost').value }) });
+                    document.getElementById('pf-amount').value = ''; document.getElementById('pf-cost').value = '';
+                    showMsg('pf-msg', ''); loadPortfolio();
+                } catch (err) { showMsg('pf-msg', err.message); }
+            });
+            document.getElementById('al-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    await api('/api/alerts', { method: 'POST', body: JSON.stringify({ asset: document.getElementById('al-asset').value, direction: document.getElementById('al-dir').value, target: document.getElementById('al-target').value }) });
+                    document.getElementById('al-target').value = '';
+                    showMsg('al-msg', ''); loadAlerts();
+                } catch (err) { showMsg('al-msg', err.message); }
+            });
+            document.getElementById('al-asset').addEventListener('change', updateAlertHint);
+            loadMe();
+        });
+
+        // ---------- PDF RAPORU ----------
+        // Ekran görüntüsü yerine: günün piyasa verileri + Google'dan aranan haberler + AI özeti
+
+        function esc(str) {
+            return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function fmtNum(v) {
+            return v.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: v < 1 ? 4 : 2 });
+        }
+
+        function changeCell(change) {
+            if (typeof change !== 'number' || isNaN(change)) return '<td style="padding:6px 8px;text-align:right;color:#94a3b8;">—</td>';
+            const color = change >= 0 ? '#059669' : '#dc2626';
+            const sign = change >= 0 ? '▲ +' : '▼ ';
+            return `<td style="padding:6px 8px;text-align:right;color:${color};font-weight:600;">${sign}${change.toFixed(2)}%</td>`;
+        }
+
+        function tableSection(title, rows) {
+            if (!rows.length) return '';
+            const body = rows.map((r, i) => `
+                <tr style="background:${i % 2 ? '#f8fafc' : '#ffffff'};">
+                    <td style="padding:6px 8px;">${esc(r.name)}</td>
+                    <td style="padding:6px 8px;text-align:right;font-weight:600;">${r.unit || '₺'}${fmtNum(r.value)}</td>
+                    ${changeCell(r.change)}
+                </tr>`).join('');
+            return `
+                <div class="avoid-break" style="margin-bottom:14px;">
+                    <div style="font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:4px;">${title}</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #e2e8f0;">
+                        <thead><tr style="background:#eff6ff;color:#334155;">
+                            <th style="padding:6px 8px;text-align:left;">Varlık</th>
+                            <th style="padding:6px 8px;text-align:right;">Fiyat</th>
+                            <th style="padding:6px 8px;text-align:right;">24 Saat</th>
+                        </tr></thead>
+                        <tbody>${body}</tbody>
+                    </table>
+                </div>`;
+        }
+
+        // ---------- GRAFİKLER (PDF için) ----------
+        // Son 30 günlük kapanış verileri: Binance (BTC, ETH, Altın) + Frankfurter (USD/TRY)
+        async function getHistory() {
+            try {
+                const d = await (await fetch('/api/market?history=1')).json();
+                return d.history || [];
+            } catch (e) {
+                console.log('Grafik verisi alınamadı:', e);
+                return [];
+            }
+        }
+
+        function makeCanvas(w, h) {
+            const c = document.createElement('canvas');
+            c.width = w * 2; c.height = h * 2;
+            const ctx = c.getContext('2d');
+            ctx.scale(2, 2);
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+            return { c, ctx };
+        }
+
+        // 30 günlük çizgi grafik → resim (dataURL)
+        function drawLineChart({ title, unit, color, data }) {
+            const W = 320, H = 165, padL = 8, padR = 62, padT = 30, padB = 20;
+            const { c, ctx } = makeCanvas(W, H);
+            const vals = data.map(d => d.v);
+            const min = Math.min(...vals), max = Math.max(...vals), range = (max - min) || 1;
+            const first = vals[0], last = vals[vals.length - 1];
+            const pct = ((last - first) / first) * 100;
+            const x = i => padL + (i / (vals.length - 1)) * (W - padL - padR);
+            const y = v => padT + (1 - (v - min) / range) * (H - padT - padB);
+            const f = v => v.toLocaleString('tr-TR', { maximumFractionDigits: v < 10 ? 3 : v < 1000 ? 2 : 0 });
+
+            // Başlık + 30 günlük değişim
+            ctx.font = 'bold 12px Arial'; ctx.fillStyle = '#0f172a'; ctx.textBaseline = 'top';
+            ctx.fillText(title, padL, 6);
+            ctx.font = 'bold 11px Arial'; ctx.fillStyle = pct >= 0 ? '#059669' : '#dc2626'; ctx.textAlign = 'right';
+            ctx.fillText(`30g: ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`, W - 4, 7);
+            ctx.textAlign = 'left';
+
+            // Izgara + sağ eksen etiketleri
+            ctx.font = '9px Arial'; ctx.textBaseline = 'middle';
+            for (let i = 0; i <= 3; i++) {
+                const v = min + (range * i) / 3, yy = y(v);
+                ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W - padR, yy); ctx.stroke();
+                ctx.fillStyle = '#64748b'; ctx.fillText(unit + f(v), W - padR + 4, yy);
+            }
+
+            // Alan dolgusu
+            const grad = ctx.createLinearGradient(0, padT, 0, H - padB);
+            grad.addColorStop(0, color + '55'); grad.addColorStop(1, color + '05');
+            ctx.beginPath(); ctx.moveTo(x(0), H - padB);
+            vals.forEach((v, i) => ctx.lineTo(x(i), y(v)));
+            ctx.lineTo(x(vals.length - 1), H - padB); ctx.closePath();
+            ctx.fillStyle = grad; ctx.fill();
+
+            // Çizgi
+            ctx.beginPath(); vals.forEach((v, i) => i ? ctx.lineTo(x(i), y(v)) : ctx.moveTo(x(i), y(v)));
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+
+            // Son nokta
+            ctx.beginPath(); ctx.arc(x(vals.length - 1), y(last), 3, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+
+            // Tarihler
+            const d = t => new Date(t).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
+            ctx.fillStyle = '#94a3b8'; ctx.textBaseline = 'bottom'; ctx.font = '9px Arial';
+            ctx.fillText(d(data[0].t), padL, H - 3);
+            ctx.textAlign = 'right'; ctx.fillText(d(data[data.length - 1].t), W - padR, H - 3);
+            return c.toDataURL('image/png');
+        }
+
+        // 24 saatlik değişim yatay çubuk grafiği
+        function drawChangeBars(items) {
+            const rowH = 20, W = 660, H = 34 + items.length * rowH, labelW = 110, mid = labelW + (W - labelW - 60) / 2;
+            const { c, ctx } = makeCanvas(W, H);
+            const maxAbs = Math.max(1, ...items.map(i => Math.abs(i.change)));
+            const half = (W - labelW - 60) / 2;
+            ctx.font = 'bold 12px Arial'; ctx.fillStyle = '#0f172a'; ctx.textBaseline = 'top';
+            ctx.fillText('Son 24 Saat Değişim (%)', 4, 4);
+            ctx.strokeStyle = '#cbd5e1'; ctx.beginPath(); ctx.moveTo(mid, 26); ctx.lineTo(mid, H - 4); ctx.stroke();
+            items.forEach((it, i) => {
+                const yy = 30 + i * rowH, len = (Math.abs(it.change) / maxAbs) * half, up = it.change >= 0;
+                ctx.font = '11px Arial'; ctx.fillStyle = '#334155'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+                ctx.fillText(it.name, 4, yy + rowH / 2 - 2);
+                ctx.fillStyle = up ? '#10b981' : '#ef4444';
+                ctx.fillRect(up ? mid : mid - len, yy + 2, Math.max(len, 1.5), rowH - 8);
+                ctx.font = 'bold 10px Arial'; ctx.fillStyle = up ? '#059669' : '#dc2626';
+                ctx.textAlign = up ? 'left' : 'right';
+                ctx.fillText(`${up ? '+' : ''}${it.change.toFixed(2)}%`, up ? mid + len + 4 : mid - len - 4, yy + rowH / 2 - 2);
+            });
+            return c.toDataURL('image/png');
+        }
+
+        function chartsSection(history, snap) {
+            const lines = history.map(h => `<img src="${drawLineChart(h)}" style="width:320px;height:165px;border:1px solid #e2e8f0;border-radius:6px;margin:0 8px 8px 0;">`).join('');
+            const changes = [...snap.metals.filter(m => m.name === 'Ons Altın'), ...snap.crypto]
+                .filter(i => typeof i.change === 'number' && !isNaN(i.change))
+                .map(i => ({ name: i.name === 'Ons Altın' ? 'Altın' : i.name, change: i.change }));
+            const bars = changes.length ? `<img class="avoid-break" src="${drawChangeBars(changes)}" style="width:660px;border:1px solid #e2e8f0;border-radius:6px;">` : '';
+            if (!lines && !bars) return '<div style="font-size:11px;color:#b45309;margin-bottom:12px;">Grafik verisi şu an alınamadı (veri kaynaklarına ulaşılamadı).</div>';
+            return `
+                <div style="font-size:13px;font-weight:700;color:#1e3a8a;margin:4px 0 8px;">Grafikler</div>
+                <div class="avoid-break" style="display:flex;flex-wrap:wrap;">${lines}</div>
+                ${bars}
+                <div style="height:14px;"></div>`;
+        }
+
+        function buildReportElement(snap, report, now, history = []) {
+            const news = Array.isArray(report.haberler) ? report.haberler : [];
+            const newsHtml = news.length ? news.map((n, i) => `
+                <div class="avoid-break" style="border:1px solid #e2e8f0;border-left:4px solid #3b82f6;border-radius:6px;padding:8px 10px;margin-bottom:8px;">
+                    <div style="font-size:12px;font-weight:700;color:#0f172a;">${i + 1}. ${esc(n.baslik)}</div>
+                    <div style="font-size:11px;color:#334155;margin-top:3px;">${esc(n.ozet)}</div>
+                    ${n.etki ? `<div style="font-size:11px;color:#1d4ed8;margin-top:4px;"><b>Piyasa etkisi:</b> ${esc(n.etki)}</div>` : ''}
+                    ${n.kaynak ? `<div style="font-size:10px;color:#64748b;margin-top:3px;">Kaynak: ${esc(n.kaynak)}</div>` : ''}
+                </div>`).join('')
+                : `<div style="font-size:11px;color:#64748b;">${report.aiFailed ? 'Haberler şu an alınamadı. Birkaç dakika sonra tekrar deneyin.' : 'Haber bulunamadı.'}</div>`;
+
+            const sources = (report.sources || []).slice(0, 12);
+            const sourcesHtml = sources.length ? `
+                <div class="avoid-break" style="margin-top:14px;">
+                    <div style="font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:4px;">Kaynaklar</div>
+                    <div style="font-size:9.5px;color:#475569;line-height:1.6;">
+                        ${sources.map(s => `• <a href="${esc(s.uri)}" style="color:#2563eb;text-decoration:none;">${esc(s.title)}</a>`).join('<br>')}
+                    </div>
+                </div>` : '';
+
+            const el = document.createElement('div');
+            el.style.cssText = 'box-sizing:border-box;width:710px;padding:20px 22px;background:#ffffff;color:#0f172a;font-family:Inter,Arial,sans-serif;';
+            el.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #3b82f6;padding-bottom:10px;margin-bottom:16px;">
+                    <div>
+                        <div style="font-size:22px;font-weight:800;color:#0f172a;">Tr<span style="color:#3b82f6;">AI</span>der Günlük Piyasa Raporu</div>
+                        <div style="font-size:11px;color:#64748b;margin-top:2px;">${esc(now.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))} • Saat ${esc(now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }))}</div>
+                    </div>
+                    <div style="font-size:10px;color:#64748b;text-align:right;">${esc(currentVersion)}</div>
+                </div>
+
+                <div class="avoid-break" style="background:#eff6ff;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+                    <div style="font-size:13px;font-weight:700;color:#1e3a8a;margin-bottom:4px;">Günün Özeti</div>
+                    <div style="font-size:11.5px;line-height:1.55;color:#1e293b;white-space:pre-wrap;">${esc(report.ozet || '—')}</div>
+                </div>
+
+                ${chartsSection(history, snap)}
+
+                ${tableSection('Döviz Kurları', snap.fx.map(x => ({ ...x, unit: '₺' })))}
+                ${tableSection('Altın & Gümüş', snap.metals)}
+                ${tableSection('Kripto Paralar', snap.crypto)}
+
+                <div style="font-size:13px;font-weight:700;color:#1e3a8a;margin:18px 0 8px;">Piyasayı Etkileyen Haberler</div>
+                ${!report.searched
+                    ? '<div style="font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 10px;">Haberler şu an alınamadı: Google arama kotası dolmuş olabilir. Yukarıdaki özet sadece fiyat verilerine dayanıyor. Birkaç dakika sonra tekrar deneyin.</div>'
+                    : newsHtml}
+
+                ${report.gorunum ? `
+                <div class="avoid-break" style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin-top:12px;">
+                    <div style="font-size:12px;font-weight:700;color:#854d0e;margin-bottom:3px;">Dikkat Edilecekler</div>
+                    <div style="font-size:11px;line-height:1.5;color:#422006;">${esc(report.gorunum)}</div>
+                </div>` : ''}
+
+                ${sourcesHtml}
+
+                <div style="margin-top:18px;padding-top:8px;border-top:1px solid #e2e8f0;font-size:9px;color:#94a3b8;">
+                    Bu rapor yapay zeka tarafından otomatik hazırlanmıştır ve yatırım tavsiyesi değildir. Döviz: open.er-api.com, Frankfurter • Kripto/Altın: Binance • Haberler: web araması (yapay zeka).
+                </div>`;
+            return el;
         }
 
         async function exportReportToPDF() {
             const btn = document.getElementById('pdfBtn');
             const originalHTML = btn.innerHTML;
+            const setBtn = (msg) => { btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>${msg}</span>`; lucide.createIcons(); };
+            btn.disabled = true;
 
             try {
-                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Hazırlanıyor...</span>`;
-                lucide.createIcons();
-                const element = document.getElementById('pdfReportContainer');
-                
-                const opt = {
-                    margin:       [0.3, 0.3, 0.3, 0.3],
-                    filename:     `TrAIder_Analiz_Raporu_${currentVersion}.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#0b0f19' },
-                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-                };
+                const now = new Date();
 
-                await html2pdf().set(opt).from(element).save();
+                setBtn('Veriler çekiliyor...');
+                const [snap, history] = await Promise.all([getMarketSnapshot(), getHistory()]);
+
+                setBtn('Haberler aranıyor...');
+                const res = await fetch('/api/report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ marketText: snapshotToText(snap), date: now.toLocaleString('tr-TR') })
+                });
+                let report = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    // Yapay zeka cevap vermese bile PDF fiyat tablolarıyla insin
+                    console.warn('AI raporu alınamadı:', report.error);
+                    appendMessageToChat(`Not: Yapay zeka şu an cevap veremedi (${report.error || res.status}). PDF sadece fiyat tablolarıyla hazırlanıyor.`, 'error');
+                    report = { ozet: 'Yapay zeka özeti şu an alınamadı (API kotası dolmuş olabilir). Aşağıdaki fiyatlar canlı verilerdir.', haberler: [], gorunum: '', sources: [], searched: true, aiFailed: true };
+                }
+
+                setBtn('PDF hazırlanıyor...');
+                const element = buildReportElement(snap, report, now, history);
+                const dateStr = now.toISOString().slice(0, 10);
+
+                const filename = `TrAIder_Piyasa_Raporu_${dateStr}.pdf`;
+                const pdfBlob = await html2pdf().set({
+                    margin: [0.35, 0.3, 0.4, 0.3],
+                    filename,
+                    image: { type: 'jpeg', quality: 0.92 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'], avoid: '.avoid-break' }
+                }).from(element).outputPdf('blob');
+
+                // 1) Bilgisayara indir
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(pdfBlob);
+                a.download = filename;
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+
+                // 2) Giriş yapılmışsa ve Telegram bağlıysa Telegram'a da gönder
+                if (currentUser && currentUser.telegram_chat_id) {
+                    setBtn('Telegram\'a gönderiliyor...');
+                    try {
+                        await api('/api/telegram/pdf', { method: 'POST', headers: { 'Content-Type': 'application/pdf', 'X-Filename': filename }, body: pdfBlob });
+                        appendMessageToChat('📨 Rapor indirildi ve Telegram\'a da gönderildi.', 'ai');
+                    } catch (e) {
+                        appendMessageToChat(`Rapor indirildi ama Telegram'a gönderilemedi: ${e.message}`, 'error');
+                    }
+                }
             } catch (error) {
                 console.error('PDF Error:', error);
+                appendMessageToChat(`PDF raporu hazırlanamadı: ${location.protocol === 'file:' ? 'Sayfayı node server.js ile açman lazım.' : error.message}`, 'error');
             } finally {
+                btn.disabled = false;
                 btn.innerHTML = originalHTML;
                 lucide.createIcons();
             }

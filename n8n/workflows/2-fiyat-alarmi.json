@@ -1,0 +1,141 @@
+{
+  "id": "TrAIderAlarmKnt1",
+  "name": "TrAIder - Fiyat Alarmı Kontrolü",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔔 Fiyat Alarmı\n5 dakikada bir alarmları kontrol eder. Hedefe ulaşan alarm varsa kullanıcıya Telegram'dan mesaj atar.\n\nGereken: .env içinde **TELEGRAM_BOT_TOKEN** ve **N8N_SECRET**.",
+        "height": 220,
+        "width": 380
+      },
+      "id": "833b144c-ea25-5245-a027-232adbcd85b6",
+      "name": "Not",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "b72281cd-724b-5339-8260-dec9acd78a6d",
+      "name": "Her 5 Dakika",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TRAIDER_URL }}/api/n8n/check-alerts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-n8n-secret",
+              "value": "={{ $env.N8N_SECRET }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "26b28f39-0a8d-53aa-becf-22453560063e",
+      "name": "Alarmları Kontrol Et",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "messages",
+        "options": {}
+      },
+      "id": "059db380-ebd4-5eac-b53c-cc0afa665554",
+      "name": "Mesajları Ayır",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $json.chat_id, text: $json.text, parse_mode: 'HTML', disable_web_page_preview: true }) }}",
+        "options": {}
+      },
+      "id": "23c4c542-2b48-594e-8ecd-465ed100692c",
+      "name": "Telegram'a Gönder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Her 5 Dakika": {
+      "main": [
+        [
+          {
+            "node": "Alarmları Kontrol Et",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alarmları Kontrol Et": {
+      "main": [
+        [
+          {
+            "node": "Mesajları Ayır",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mesajları Ayır": {
+      "main": [
+        [
+          {
+            "node": "Telegram'a Gönder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Istanbul"
+  },
+  "pinData": {}
+}
